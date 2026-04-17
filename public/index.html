@@ -4,528 +4,377 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GSBW — FIFA Refactor Bug Writer</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 :root{
-  --green:#00c853;--green2:#00e676;--green3:#69f0ae;
-  --gold:#ffd600;--gold2:#ffab00;
-  --bg:#020a04;--bg2:#041008;--surface:#061a0a;--surface2:#0a2410;--surface3:#0d2e14;
-  --border:#0f3518;--border2:#174d22;--border3:#1e6b2e;
-  --text:#d4f5dc;--text2:#7ab88a;--text3:#2d5c3a;
-  --red:#ff1744;--amber:#ff9100;--blue:#00b0ff;--purple:#d500f9;
-  --p0:#ff1744;--p1:#ff9100;--p2:#ffd600;--p3:#00b0ff;--p4:#d500f9;--p5:#546e7a;
-  --s1:#ff1744;--s2:#ff9100;--s3:#00c853;--s4:#546e7a;
-  --font-head:'Rajdhani',sans-serif;
-  --font-body:'Exo 2',sans-serif;
-  --font-mono:'Share Tech Mono',monospace;
+  --bg:#020408;--bg2:#050b14;--surface:#080f1a;--surface2:#0c1525;--surface3:#101d30;
+  --border:#0e2040;--border2:#163060;--border3:#1e4080;
+  --glow:#00f0ff;--glow2:#ff6b00;--glow3:#00ff88;
+  --accent:#00f0ff;--accent2:#ff6b00;--accent3:#00ff88;--gold:#ffd700;
+  --text:#c8e0ff;--text2:#6a90b8;--text3:#2a4060;
+  --p0:#ff2244;--p1:#ff8800;--p2:#ffdd00;--p3:#00ccff;--p4:#aa44ff;--p5:#556677;
+  --s1:#ff2244;--s2:#ff8800;--s3:#00ff88;--s4:#556677;
+  --fh:'Orbitron',monospace;--fb:'Exo 2',sans-serif;--fm:'Share Tech Mono',monospace;
 }
 
-/* ══════ LANDING SCREEN ══════ */
-#landing{
-  position:fixed;inset:0;z-index:9999;
-  background:#020a04;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  overflow:hidden;
-}
-#landing.hide{animation:landingOut .8s ease forwards}
-@keyframes landingOut{to{opacity:0;transform:scale(1.05);pointer-events:none}}
+/* ── LANDING ── */
+#landing{position:fixed;inset:0;z-index:9999;background:#020408;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#landing.out{animation:lOut .8s ease forwards;pointer-events:none}
+@keyframes lOut{to{opacity:0;transform:scale(1.04)}}
+#pc{position:absolute;inset:0}
+.lc{position:relative;z-index:2;text-align:center;animation:lIn .7s ease .3s both}
+@keyframes lIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.ball{width:88px;height:88px;margin:0 auto 26px;background:radial-gradient(circle at 35% 32%,#fff 0%,#ccc 45%,#888 100%);border-radius:50%;position:relative;animation:bSpin 2s linear infinite,bBounce 1s ease-in-out infinite alternate;box-shadow:0 0 40px rgba(0,240,255,.45),0 8px 28px rgba(0,0,0,.7)}
+@keyframes bSpin{to{transform:rotate(360deg)}}
+@keyframes bBounce{from{transform:translateY(0) rotate(0)}to{transform:translateY(-16px) rotate(180deg)}}
+.ball::before{content:'';position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.18) 0deg 36deg,transparent 36deg 72deg)}
+.ball::after{content:'';position:absolute;inset:-7px;border-radius:50%;background:conic-gradient(transparent,rgba(0,240,255,.35),transparent,rgba(0,240,255,.35),transparent);animation:halo 1.5s linear infinite}
+@keyframes halo{to{transform:rotate(360deg)}}
+.lt{font-family:var(--fh);font-size:60px;font-weight:900;letter-spacing:8px;background:linear-gradient(135deg,var(--glow),#fff,var(--glow));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 2.5s linear infinite}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+.ls{font-family:var(--fh);font-size:14px;letter-spacing:5px;color:var(--text2);margin-top:7px;text-transform:uppercase}
+.lp{margin-top:18px;font-family:var(--fm);font-size:12px;color:var(--gold);letter-spacing:3px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);padding:6px 20px;border-radius:2px;display:inline-block;animation:pglow 1.5s ease-in-out infinite}
+@keyframes pglow{0%,100%{box-shadow:0 0 8px rgba(255,214,0,.2)}50%{box-shadow:0 0 20px rgba(255,214,0,.5)}}
+.lbar{width:200px;height:3px;background:var(--border2);border-radius:2px;margin:26px auto 0;overflow:hidden}
+.lbf{height:100%;background:linear-gradient(90deg,var(--glow),var(--gold),var(--glow));border-radius:2px;width:0%;animation:barfill 4.5s ease forwards .5s}
+@keyframes barfill{to{width:100%}}
+.ltxt{font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:2px;margin-top:9px;animation:blink2 1s ease-in-out infinite}
+@keyframes blink2{0%,100%{opacity:.4}50%{opacity:1}}
 
-#pitch-canvas{position:absolute;inset:0}
+/* ── BG ── */
+body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
+.scan{position:fixed;inset:0;z-index:1;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,.012) 2px,rgba(0,240,255,.012) 4px);animation:scanM 8s linear infinite}
+@keyframes scanM{0%{background-position:0 0}100%{background-position:0 80px}}
+.vig{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 38%,rgba(0,0,0,.82) 100%)}
 
-.landing-content{
-  position:relative;z-index:2;text-align:center;
-  animation:landingIn .8s ease .3s both;
-}
-@keyframes landingIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+/* ── APP ── */
+#app{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;opacity:0;transition:opacity .7s}
+#app.vis{opacity:1}
 
-.ball-anim{
-  width:90px;height:90px;margin:0 auto 28px;
-  background:radial-gradient(circle at 35% 35%,#fff 0%,#ddd 40%,#999 100%);
-  border-radius:50%;
-  position:relative;
-  animation:ballSpin 2s linear infinite, ballBounce 1s ease-in-out infinite alternate;
-  box-shadow:0 0 40px rgba(0,200,83,.4),0 8px 30px rgba(0,0,0,.6);
-}
-@keyframes ballSpin{to{transform:rotate(360deg)}}
-@keyframes ballBounce{from{transform:translateY(0) rotate(0deg)}to{transform:translateY(-18px) rotate(180deg)}}
-.ball-anim::before{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  background:
-    radial-gradient(circle at 50% 20%,rgba(0,0,0,.3) 0%,transparent 40%),
-    repeating-conic-gradient(rgba(0,0,0,.15) 0deg 36deg,transparent 36deg 72deg);
-}
-.ball-anim::after{
-  content:'';position:absolute;inset:-8px;border-radius:50%;
-  background:conic-gradient(transparent,rgba(0,200,83,.3),transparent,rgba(0,200,83,.3),transparent);
-  animation:haloSpin 1.5s linear infinite;
-}
-@keyframes haloSpin{to{transform:rotate(360deg)}}
+/* ── HEADER ── */
+.hdr{background:rgba(5,11,20,.97);border-bottom:1px solid var(--border2);padding:0 22px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),var(--gold),var(--glow),transparent);animation:hl 3.5s ease-in-out infinite}
+@keyframes hl{0%,100%{opacity:.4}50%{opacity:1}}
+.lw{display:flex;align-items:center;gap:14px}
+.li{width:34px;height:34px;background:radial-gradient(circle at 35% 32%,#fff,#bbb);border-radius:50%;position:relative;overflow:hidden;box-shadow:0 0 14px rgba(0,240,255,.5);animation:lbspin 4s linear infinite;flex-shrink:0}
+@keyframes lbspin{to{transform:rotate(360deg)}}
+.li::before{content:'';position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.2) 0deg 36deg,transparent 36deg 72deg)}
+.ltx{font-family:var(--fh);font-size:20px;font-weight:900;letter-spacing:4px;background:linear-gradient(90deg,var(--glow),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.lsb{font-size:9px;color:var(--text3);letter-spacing:2px;font-family:var(--fm);margin-top:-3px}
+.pb{background:linear-gradient(135deg,rgba(255,214,0,.12),rgba(255,214,0,.04));border:1px solid rgba(255,214,0,.45);padding:4px 12px;border-radius:2px;font-family:var(--fh);font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px;text-shadow:0 0 10px rgba(255,214,0,.5)}
+.hnav{display:flex;gap:4px}
+.hn{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:6px 13px;border-radius:2px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:1px;transition:all .2s;text-transform:uppercase;position:relative;overflow:hidden}
+.hn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,240,255,.05),transparent);transform:translateX(-100%);transition:transform .3s}
+.hn:hover{border-color:var(--glow);color:var(--glow);text-shadow:0 0 8px var(--glow)}.hn:hover::before{transform:translateX(100%)}
+.hn.on{background:rgba(0,240,255,.1);border-color:var(--glow);color:var(--glow);text-shadow:0 0 10px var(--glow);box-shadow:0 0 16px rgba(0,240,255,.12)}
 
-.landing-title{
-  font-family:var(--font-head);font-size:64px;font-weight:700;
-  letter-spacing:8px;line-height:1;
-  background:linear-gradient(135deg,var(--green2),var(--gold),var(--green3));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  text-shadow:none;
-  animation:titlePulse 2s ease-in-out infinite;
-}
-@keyframes titlePulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.2)}}
-.landing-sub{
-  font-family:var(--font-head);font-size:16px;letter-spacing:5px;
-  color:var(--text2);margin-top:8px;text-transform:uppercase;
-}
-.landing-proj{
-  margin-top:20px;
-  font-family:var(--font-mono);font-size:13px;
-  color:var(--gold);letter-spacing:3px;
-  background:rgba(255,214,0,.08);
-  border:1px solid rgba(255,214,0,.3);
-  padding:6px 20px;border-radius:2px;
-  display:inline-block;
-  animation:projGlow 1.5s ease-in-out infinite;
-}
-@keyframes projGlow{0%,100%{box-shadow:0 0 10px rgba(255,214,0,.2)}50%{box-shadow:0 0 20px rgba(255,214,0,.5)}}
-
-.landing-bar{
-  width:200px;height:3px;background:var(--border2);
-  border-radius:2px;margin:28px auto 0;overflow:hidden;
-}
-.landing-bar-fill{
-  height:100%;
-  background:linear-gradient(90deg,var(--green),var(--gold),var(--green2));
-  border-radius:2px;width:0%;
-  animation:barFill 4s ease forwards .5s;
-}
-@keyframes barFill{to{width:100%}}
-.landing-loading{
-  font-family:var(--font-mono);font-size:11px;color:var(--text3);
-  letter-spacing:2px;margin-top:10px;
-  animation:loadBlink 1s ease-in-out infinite;
-}
-@keyframes loadBlink{0%,100%{opacity:.4}50%{opacity:1}}
-
-/* ══════ BACKGROUND ══════ */
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
-#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
-.grass-overlay{
-  position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:repeating-linear-gradient(
-    90deg,
-    transparent 0px,transparent 59px,
-    rgba(0,200,83,.018) 59px,rgba(0,200,83,.018) 60px
-  ),repeating-linear-gradient(
-    0deg,
-    transparent 0px,transparent 59px,
-    rgba(0,200,83,.012) 59px,rgba(0,200,83,.012) 60px
-  );
-}
-.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.8) 100%)}
-
-/* ══════ APP ══════ */
-#app{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;opacity:0;transition:opacity .8s ease}
-#app.visible{opacity:1}
-
-/* ══════ HEADER ══════ */
-.header{
-  background:rgba(4,16,8,.97);
-  border-bottom:1px solid var(--border2);
-  padding:0 22px;height:58px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;
-  backdrop-filter:blur(20px);
-}
-.header::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--green),var(--gold),var(--green),transparent);
-  animation:headerLine 4s ease-in-out infinite;
-}
-@keyframes headerLine{0%,100%{opacity:.5}50%{opacity:1}}
-
-.logo-wrap{display:flex;align-items:center;gap:14px}
-.logo-ball{
-  width:34px;height:34px;
-  background:radial-gradient(circle at 35% 35%,#fff,#bbb);
-  border-radius:50%;flex-shrink:0;
-  position:relative;overflow:hidden;
-  box-shadow:0 0 14px rgba(0,200,83,.5);
-  animation:logoBallSpin 4s linear infinite;
-}
-@keyframes logoBallSpin{to{transform:rotate(360deg)}}
-.logo-ball::before{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  background:repeating-conic-gradient(rgba(0,0,0,.2) 0deg 36deg,transparent 36deg 72deg);
-}
-.logo-text{
-  font-family:var(--font-head);font-size:22px;font-weight:700;letter-spacing:4px;
-  background:linear-gradient(90deg,var(--green2),var(--gold));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.logo-sub{font-size:9px;color:var(--text3);letter-spacing:2px;font-family:var(--font-mono);margin-top:-3px}
-.proj-badge{
-  background:linear-gradient(135deg,rgba(255,214,0,.12),rgba(255,214,0,.04));
-  border:1px solid rgba(255,214,0,.45);
-  padding:4px 12px;border-radius:2px;
-  font-family:var(--font-head);font-size:10px;font-weight:700;
-  color:var(--gold);letter-spacing:2px;
-  text-shadow:0 0 10px rgba(255,214,0,.5);
-}
-
-.header-nav{display:flex;gap:4px}
-.hn-btn{
-  background:transparent;border:1px solid var(--border2);
-  color:var(--text2);padding:6px 14px;border-radius:2px;
-  font-size:11px;font-weight:600;cursor:pointer;
-  font-family:var(--font-head);letter-spacing:1px;
-  transition:all .2s;text-transform:uppercase;position:relative;overflow:hidden;
-}
-.hn-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,200,83,.06),transparent);transform:translateX(-100%);transition:transform .3s}
-.hn-btn:hover{border-color:var(--green);color:var(--green);text-shadow:0 0 8px var(--green)}
-.hn-btn:hover::before{transform:translateX(100%)}
-.hn-btn.active{background:rgba(0,200,83,.1);border-color:var(--green);color:var(--green);text-shadow:0 0 10px var(--green);box-shadow:0 0 16px rgba(0,200,83,.15)}
-
-/* ══════ LAYOUT ══════ */
-.layout{display:grid;grid-template-columns:224px 1fr;flex:1;min-height:calc(100vh - 58px)}
-.sidebar{
-  background:rgba(4,16,8,.95);border-right:1px solid var(--border2);
-  padding:14px 0;position:relative;backdrop-filter:blur(10px);
-}
-.sidebar::after{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,var(--green),transparent);opacity:.2}
-
-.sl{font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:2px;padding:0 18px;margin:14px 0 6px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+/* ── LAYOUT ── */
+.lay{display:grid;grid-template-columns:224px 1fr;flex:1;min-height:calc(100vh - 56px)}
+.sb{background:rgba(5,11,20,.95);border-right:1px solid var(--border2);padding:14px 0;position:relative}
+.sb::after{content:'';position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,var(--glow),transparent);opacity:.2}
+.sl{font-family:var(--fm);font-size:9px;color:var(--text3);letter-spacing:2px;padding:0 18px;margin:14px 0 6px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
 .sl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
-
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;font-size:12px;color:var(--text2);transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:var(--font-head);letter-spacing:1px;border-left:2px solid transparent}
-.nav-item:hover{background:rgba(0,200,83,.04);color:var(--text)}
-.nav-item.active{background:linear-gradient(90deg,rgba(0,200,83,.08),transparent);color:var(--green);border-left-color:var(--green);text-shadow:0 0 8px var(--green)}
-
-.stat-block{margin:10px 12px;background:rgba(6,26,10,.9);border:1px solid var(--border2);border-radius:3px;padding:12px;position:relative;overflow:hidden}
-.stat-block::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent);animation:topGlow 3s ease-in-out infinite}
-@keyframes topGlow{0%,100%{opacity:.3}50%{opacity:.9}}
-.stat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px}
-.stat-row:last-child{margin-bottom:0}
-.stat-val{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);text-shadow:0 0 8px var(--green)}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;font-size:11px;color:var(--text2);transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:var(--fh);letter-spacing:1px;border-left:2px solid transparent}
+.ni:hover{background:rgba(0,240,255,.04);color:var(--text)}
+.ni.on{background:linear-gradient(90deg,rgba(0,240,255,.08),transparent);color:var(--glow);border-left-color:var(--glow);text-shadow:0 0 8px var(--glow)}
+.stb{margin:10px 12px;background:rgba(8,15,26,.9);border:1px solid var(--border2);border-radius:3px;padding:12px;position:relative;overflow:hidden}
+.stb::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),transparent);animation:tg 3s ease-in-out infinite}
+@keyframes tg{0%,100%{opacity:.3}50%{opacity:.9}}
+.sr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:11px}.sr:last-child{margin-bottom:0}
+.sv{font-family:var(--fm);font-size:12px;font-weight:700;color:var(--glow);text-shadow:0 0 8px var(--glow)}
 .tbar{height:3px;background:var(--border);border-radius:2px;margin-top:9px;overflow:hidden}
-.tfill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:2px;transition:width 1s linear}
+.tf{height:100%;background:linear-gradient(90deg,var(--glow),var(--accent2));border-radius:2px;transition:width 1s linear}
+.pg{padding:0 14px;display:flex;flex-direction:column;gap:4px}
+.pgr{display:flex;gap:8px;align-items:center;font-size:10px}
+.pgc{font-family:var(--fm);font-weight:700;min-width:22px}
 
-.pguide{padding:0 14px;display:flex;flex-direction:column;gap:4px}
-.pg-row{display:flex;gap:8px;align-items:center;font-size:10px;font-family:var(--font-body)}
-.pg-code{font-family:var(--font-mono);font-weight:700;min-width:22px}
+/* ── MAIN ── */
+.main{overflow-y:auto;padding:24px;background:rgba(2,4,8,.5)}
+.pg2{display:none}.pg2.on{display:block;animation:pin .3s ease}
+@keyframes pin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pt{font-family:var(--fh);font-size:20px;font-weight:900;letter-spacing:3px;margin-bottom:3px;text-transform:uppercase;background:linear-gradient(90deg,#fff,var(--glow));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ps{font-size:12px;color:var(--text2);margin-bottom:22px;letter-spacing:.3px}
 
-/* ══════ MAIN ══════ */
-.main{overflow-y:auto;padding:24px;background:rgba(2,10,4,.5)}
-.page{display:none}.page.active{display:block;animation:pageIn .3s ease}
-@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.ptitle{font-family:var(--font-head);font-size:22px;font-weight:700;letter-spacing:3px;margin-bottom:3px;text-transform:uppercase;background:linear-gradient(90deg,#fff,var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.psub{font-size:12px;color:var(--text2);margin-bottom:22px;letter-spacing:.3px}
-
-/* ══════ FORM ══════ */
+/* ── FORM ── */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.fgroup{display:flex;flex-direction:column;gap:5px}
-.fgroup.full{grid-column:1/-1}
-.flabel{font-family:var(--font-head);font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:6px}
-.flabel::before{content:'▸';color:var(--green);font-size:8px}
+.fg1{display:flex;flex-direction:column;gap:5px}
+.fg1.full{grid-column:1/-1}
+.fl{font-family:var(--fh);font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:6px}
+.fl::before{content:'▸';color:var(--glow);font-size:8px}
+.fi,.fsel,.fta{background:rgba(8,15,26,.9);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:2px;font-size:12px;font-family:var(--fb);outline:none;transition:all .2s;-webkit-appearance:none}
+.fi:focus,.fsel:focus,.fta:focus{border-color:var(--glow);box-shadow:0 0 0 1px rgba(0,240,255,.18),0 0 18px rgba(0,240,255,.06);background:rgba(0,240,255,.02)}
+.fi::placeholder,.fta::placeholder{color:var(--text3)}
+.fsel option{background:#080f1a;color:var(--text)}
+.fta{resize:vertical;min-height:82px;line-height:1.7}.fta.big{min-height:118px}
+.ab{display:inline-flex;align-items:center;gap:4px;font-family:var(--fm);font-size:9px;color:var(--accent3);background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25);padding:2px 7px;border-radius:2px;margin-left:8px;animation:abp 2s ease-in-out infinite}
+@keyframes abp{0%,100%{opacity:.7}50%{opacity:1}}
+.adc{width:5px;height:5px;border-radius:50%;background:var(--accent3);animation:adb 1.5s infinite}
+@keyframes adb{0%,100%{opacity:1}50%{opacity:.2}}
 
-.finput,.fselect,.ftarea{background:rgba(6,26,10,.9);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:2px;font-size:12px;font-family:var(--font-body);outline:none;transition:all .2s;-webkit-appearance:none}
-.finput:focus,.fselect:focus,.ftarea:focus{border-color:var(--green);box-shadow:0 0 0 1px rgba(0,200,83,.2),0 0 20px rgba(0,200,83,.06);background:rgba(0,200,83,.02)}
-.finput::placeholder,.ftarea::placeholder{color:var(--text3)}
-.fselect option{background:#061a0a;color:var(--text)}
-.ftarea{resize:vertical;min-height:82px;line-height:1.7}
-.ftarea.big{min-height:115px}
+/* ── AI BTN ── */
+.btnai{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:linear-gradient(135deg,rgba(0,240,255,.1),rgba(0,240,255,.03),rgba(255,107,0,.04));border:1px solid rgba(0,240,255,.4);border-radius:3px;color:var(--glow);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:2px;text-transform:uppercase;transition:all .25s;margin-bottom:20px;position:relative;overflow:hidden}
+.btnai::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,240,255,.08),transparent);transform:translateX(-100%);transition:transform .5s}
+.btnai:hover:not(:disabled){border-color:var(--glow);box-shadow:0 0 30px rgba(0,240,255,.2);text-shadow:0 0 10px var(--glow);transform:translateY(-1px)}.btnai:hover::before{transform:translateX(100%)}
+.btnai:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.spinico{display:inline-block;animation:spini 2.5s linear infinite}
+@keyframes spini{to{transform:rotate(360deg)}}
 
-.auto-badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--green3);background:rgba(0,200,83,.08);border:1px solid rgba(0,200,83,.25);padding:2px 7px;border-radius:2px;margin-left:8px}
-.auto-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:dotBlink 1.5s infinite}
-@keyframes dotBlink{0%,100%{opacity:1}50%{opacity:.2}}
+/* ── OUTPUT ── */
+.outs{background:rgba(5,11,20,.97);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:18px;position:relative}
+.outs::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),var(--accent2),transparent)}
+.outh{background:rgba(8,15,26,.9);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.outhl{display:flex;align-items:center;gap:8px;font-family:var(--fh);font-size:10px;font-weight:700;color:var(--text2);letter-spacing:2px;text-transform:uppercase}
+.odot{width:7px;height:7px;border-radius:50%;background:var(--glow);animation:bdot 2s infinite;box-shadow:0 0 6px var(--glow)}
+@keyframes bdot{0%,100%{opacity:1}50%{opacity:.2}}
+.cb{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:4px 10px;border-radius:2px;font-size:10px;cursor:pointer;font-family:var(--fh);letter-spacing:1px;transition:all .2s;text-transform:uppercase}
+.cb:hover{border-color:var(--glow);color:var(--glow)}.cb.sv2{border-color:rgba(0,255,136,.3);color:var(--accent3)}.cb.sv2:hover{box-shadow:0 0 10px rgba(0,255,136,.2)}
+.outb{padding:16px}
+.ldg{text-align:center;padding:36px 20px;font-family:var(--fm);font-size:12px;color:var(--text2)}
+.ldspin{display:inline-block;width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--glow);border-right-color:var(--accent2);border-radius:50%;animation:spini .8s linear infinite;margin-bottom:12px;box-shadow:0 0 12px rgba(0,240,255,.25)}
+.ldtxt{animation:blink2 1.5s ease-in-out infinite}
+.bugout{display:none}.bugout.vis{display:block;animation:fadeU .4s ease}
+@keyframes fadeU{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ══════ AI BUTTON ══════ */
-.btn-ai{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:linear-gradient(135deg,rgba(0,200,83,.12),rgba(0,200,83,.04),rgba(255,214,0,.04));border:1px solid rgba(0,200,83,.4);border-radius:3px;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-head);letter-spacing:2px;text-transform:uppercase;transition:all .25s;margin-bottom:20px;position:relative;overflow:hidden}
-.btn-ai::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,200,83,.08),transparent);transform:translateX(-100%);transition:transform .5s}
-.btn-ai:hover:not(:disabled){border-color:var(--green2);box-shadow:0 0 30px rgba(0,200,83,.2),0 0 60px rgba(0,200,83,.06);text-shadow:0 0 10px var(--green);transform:translateY(-1px)}
-.btn-ai:hover::before{transform:translateX(100%)}
-.btn-ai:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.spin-icon{display:inline-block;animation:spinIcon 2s linear infinite}
-@keyframes spinIcon{to{transform:rotate(360deg)}}
+/* title line */
+.btitle{font-family:var(--fm);font-size:13px;color:var(--accent2);margin-bottom:12px;padding:10px 14px;background:rgba(255,107,0,.05);border-left:2px solid var(--accent2);border-radius:0 3px 3px 0;line-height:1.5;text-shadow:0 0 10px rgba(255,107,0,.3)}
 
-/* ══════ OUTPUT ══════ */
-.out-section{background:rgba(4,16,8,.97);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:18px;position:relative}
-.out-section::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),var(--gold),transparent)}
-.out-hdr{background:rgba(6,26,10,.9);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.out-hdr-l{display:flex;align-items:center;gap:8px;font-family:var(--font-head);font-size:10px;font-weight:700;color:var(--text2);letter-spacing:2px;text-transform:uppercase}
-.odot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite;box-shadow:0 0 6px var(--green)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.cbtn{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:4px 10px;border-radius:2px;font-size:10px;cursor:pointer;font-family:var(--font-head);letter-spacing:1px;transition:all .2s;text-transform:uppercase}
-.cbtn:hover{border-color:var(--green);color:var(--green)}
-.cbtn.save{border-color:rgba(0,200,83,.3);color:var(--green3)}
-.cbtn.save:hover{box-shadow:0 0 10px rgba(0,200,83,.2)}
-.out-body{padding:16px}
-
-.loading{text-align:center;padding:36px 20px;font-family:var(--font-mono);font-size:12px;color:var(--text2)}
-.load-ball{width:36px;height:36px;background:radial-gradient(circle at 35% 35%,#fff,#999);border-radius:50%;margin:0 auto 14px;animation:loadBall 1s linear infinite;position:relative;box-shadow:0 0 14px rgba(0,200,83,.4)}
-.load-ball::before{content:'';position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.2) 0deg 36deg,transparent 36deg 72deg)}
-@keyframes loadBall{to{transform:rotate(360deg)}}
-.load-txt{animation:loadBlink 1.5s ease-in-out infinite}
-@keyframes loadBlink{0%,100%{opacity:.4}50%{opacity:1}}
-
-.bug-out{display:none}.bug-out.vis{display:block;animation:fadeUp .4s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-.btitle{font-family:var(--font-mono);font-size:13px;color:var(--gold);margin-bottom:12px;padding:10px 14px;background:rgba(255,214,0,.04);border-left:2px solid var(--gold);border-radius:0 3px 3px 0;line-height:1.5;text-shadow:0 0 10px rgba(255,214,0,.3)}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.tag{padding:3px 9px;border-radius:2px;font-size:10px;font-weight:700;font-family:var(--font-mono);letter-spacing:.5px}
-.tp{background:rgba(0,200,83,.08);color:var(--green);border:1px solid rgba(0,200,83,.25);text-shadow:0 0 6px var(--green)}
-.tc{background:rgba(0,230,118,.08);color:var(--green3);border:1px solid rgba(0,230,118,.22)}
-.tag-p0{background:rgba(255,23,68,.1);color:var(--p0);border:1px solid rgba(255,23,68,.28)}
-.tag-p1{background:rgba(255,145,0,.1);color:var(--p1);border:1px solid rgba(255,145,0,.28)}
-.tag-p2{background:rgba(255,214,0,.1);color:var(--p2);border:1px solid rgba(255,214,0,.28)}
-.tag-p3{background:rgba(0,176,255,.1);color:var(--p3);border:1px solid rgba(0,176,255,.28)}
-.tag-p4{background:rgba(213,0,249,.1);color:var(--p4);border:1px solid rgba(213,0,249,.28)}
-.tag-p5{background:rgba(84,110,122,.1);color:var(--p5);border:1px solid rgba(84,110,122,.28)}
-.tag-s1{background:rgba(255,23,68,.1);color:var(--s1);border:1px solid rgba(255,23,68,.28)}
-.tag-s2{background:rgba(255,145,0,.1);color:var(--s2);border:1px solid rgba(255,145,0,.28)}
-.tag-s3{background:rgba(0,200,83,.1);color:var(--s3);border:1px solid rgba(0,200,83,.28)}
-.tag-s4{background:rgba(84,110,122,.1);color:var(--s4);border:1px solid rgba(84,110,122,.28)}
+.tag{padding:3px 9px;border-radius:2px;font-size:10px;font-weight:700;font-family:var(--fm);letter-spacing:.4px}
+.tp{background:rgba(0,240,255,.08);color:var(--glow);border:1px solid rgba(0,240,255,.22);text-shadow:0 0 6px var(--glow)}
+.tc{background:rgba(0,255,136,.08);color:var(--accent3);border:1px solid rgba(0,255,136,.22)}
+.tp0{background:rgba(255,34,68,.1);color:var(--p0);border:1px solid rgba(255,34,68,.26)}
+.tp1{background:rgba(255,136,0,.1);color:var(--p1);border:1px solid rgba(255,136,0,.26)}
+.tp2{background:rgba(255,221,0,.1);color:var(--p2);border:1px solid rgba(255,221,0,.26)}
+.tp3{background:rgba(0,204,255,.1);color:var(--p3);border:1px solid rgba(0,204,255,.26)}
+.tp4{background:rgba(170,68,255,.1);color:var(--p4);border:1px solid rgba(170,68,255,.26)}
+.tp5{background:rgba(85,102,119,.1);color:var(--p5);border:1px solid rgba(85,102,119,.26)}
+.ts1{background:rgba(255,34,68,.1);color:var(--s1);border:1px solid rgba(255,34,68,.26)}
+.ts2{background:rgba(255,136,0,.1);color:var(--s2);border:1px solid rgba(255,136,0,.26)}
+.ts3{background:rgba(0,255,136,.1);color:var(--s3);border:1px solid rgba(0,255,136,.26)}
+.ts4{background:rgba(85,102,119,.1);color:var(--s4);border:1px solid rgba(85,102,119,.26)}
 
 .bsec{margin-bottom:16px}
-.bslabel{font-family:var(--font-head);font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
-.bslabel::before{content:'//';color:var(--green);font-size:10px;font-family:var(--font-mono)}
+.bsl{font-family:var(--fh);font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.bsl::before{content:'//';color:var(--glow);font-size:10px;font-family:var(--fm)}
 
-.vgrid{display:flex;flex-direction:column;gap:6px}
-.vcard{background:rgba(6,26,10,.9);border:1px solid var(--border);border-radius:3px;padding:10px 12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.vcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--border2);transition:background .2s}
-.vcard:hover{border-color:var(--border2)}.vcard:hover::before{background:var(--green2)}
-.vcard.sel{border-color:rgba(0,200,83,.3);background:rgba(0,200,83,.04)}.vcard.sel::before{background:var(--green);box-shadow:0 0 8px var(--green)}
-.vnum{font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-bottom:3px;letter-spacing:1px}
-.vtxt{font-size:12px;color:var(--text);line-height:1.7;font-family:var(--font-body)}
+.vgrid{display:flex;flex-direction:column;gap:7px}
+.vc{background:rgba(8,15,26,.9);border:1px solid var(--border);border-radius:3px;padding:11px 13px;cursor:pointer;transition:all .2s;position:relative}
+.vc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--border2);transition:background .2s;border-radius:2px 0 0 2px}
+.vc:hover{border-color:var(--border2)}.vc:hover::before{background:var(--glow)}
+.vc.sel{border-color:rgba(0,240,255,.28);background:rgba(0,240,255,.03)}.vc.sel::before{background:var(--glow);box-shadow:0 0 8px var(--glow)}
+.vn{font-family:var(--fm);font-size:9px;color:var(--text3);margin-bottom:4px;letter-spacing:1px}
+.vt{font-size:12px;color:var(--text);line-height:1.75;font-family:var(--fb)}
 
-.rsteps{display:flex;flex-direction:column;gap:8px}
-.rstep{display:flex;gap:10px;font-size:12px;color:var(--text);line-height:1.6;font-family:var(--font-body)}
-.rnum{min-width:20px;height:20px;background:rgba(0,200,83,.1);border:1px solid var(--border2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--font-mono);color:var(--green);flex-shrink:0;margin-top:2px}
-.obs{padding:10px 14px;background:rgba(255,145,0,.06);border:1px solid rgba(255,145,0,.2);border-radius:3px;font-size:12px;color:var(--amber);font-family:var(--font-body);line-height:1.7}
-.exp{padding:10px 14px;background:rgba(0,200,83,.05);border:1px solid rgba(0,200,83,.18);border-radius:3px;font-size:12px;color:var(--green2);font-family:var(--font-body);line-height:1.7}
+.rs{display:flex;flex-direction:column;gap:8px}
+.rsi{display:flex;gap:10px;font-size:12px;color:var(--text);line-height:1.6;font-family:var(--fb)}
+.rsn{min-width:20px;height:20px;background:linear-gradient(135deg,rgba(0,240,255,.12),rgba(0,240,255,.04));border:1px solid var(--border2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--fm);color:var(--glow);flex-shrink:0;margin-top:2px}
+.obs{padding:10px 14px;background:rgba(255,107,0,.06);border:1px solid rgba(255,107,0,.2);border-radius:3px;font-size:12px;color:var(--accent2);font-family:var(--fb);line-height:1.75}
+.exp{padding:10px 14px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.18);border-radius:3px;font-size:12px;color:var(--accent3);font-family:var(--fb);line-height:1.75}
 
-/* ══════ LOG ══════ */
-.log-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.bcnt{background:rgba(0,200,83,.06);border:1px solid rgba(0,200,83,.18);color:var(--green);font-size:11px;padding:3px 10px;border-radius:2px;font-family:var(--font-mono);text-shadow:0 0 8px var(--green)}
-.log-table{background:rgba(4,16,8,.97);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:relative}
-.log-table::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
-.thdr{display:grid;grid-template-columns:38px 1fr 110px 58px 58px 85px 80px;background:rgba(6,26,10,.9);border-bottom:1px solid var(--border2);padding:8px 16px;font-family:var(--font-head);font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px}
-.trow{display:grid;grid-template-columns:38px 1fr 110px 58px 58px 85px 80px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);align-items:center;cursor:pointer;transition:all .15s;font-family:var(--font-body)}
-.trow:hover{background:rgba(0,200,83,.03);color:var(--text)}.trow:last-child{border-bottom:none}
+/* ── LOG ── */
+.lhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.lcnt{background:rgba(0,240,255,.06);border:1px solid rgba(0,240,255,.18);color:var(--glow);font-size:11px;padding:3px 10px;border-radius:2px;font-family:var(--fm);text-shadow:0 0 8px var(--glow)}
+.ltable{background:rgba(5,11,20,.97);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:relative}
+.ltable::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),transparent)}
+.thdr{display:grid;grid-template-columns:38px 1fr 110px 58px 58px 80px;background:rgba(8,15,26,.9);border-bottom:1px solid var(--border2);padding:8px 16px;font-family:var(--fh);font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px}
+.trow{display:grid;grid-template-columns:38px 1fr 110px 58px 58px 80px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);align-items:center;cursor:pointer;transition:all .15s;font-family:var(--fb)}
+.trow:hover{background:rgba(0,240,255,.03);color:var(--text)}.trow:last-child{border-bottom:none}
 .rtitle{color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px;font-size:11px}
 .empty{text-align:center;padding:50px 20px;color:var(--text3)}
-.empty-icon{font-size:40px;margin-bottom:12px}
-.empty-txt{font-family:var(--font-head);font-size:14px;color:var(--text2);letter-spacing:2px;margin-bottom:5px}
-.empty-sub{font-size:11px;font-family:var(--font-mono)}
+.emptyi{font-size:36px;margin-bottom:12px}
+.emptyt{font-family:var(--fh);font-size:13px;color:var(--text2);letter-spacing:2px;margin-bottom:5px}
 
-/* ══════ ADDON ══════ */
-.addon-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.acard{background:rgba(4,16,8,.97);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:relative}
-.acard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent);opacity:.4}
-.achdr{background:rgba(6,26,10,.9);padding:11px 16px;border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;justify-content:space-between}
-.acbody{padding:14px}
-.list-scroll{max-height:260px;overflow-y:auto}
-.litem{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;border-bottom:1px solid rgba(15,53,24,.6);font-size:11px;color:var(--text2);font-family:var(--font-body);transition:background .15s}
-.litem:hover{background:rgba(0,200,83,.03)}.litem:last-child{border-bottom:none}
-.rmbtn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 4px;transition:color .15s}
-.rmbtn:hover{color:var(--red)}
-.addrow{padding:10px 16px;display:flex;gap:7px;border-top:1px solid var(--border)}
-.addbtn{background:linear-gradient(135deg,rgba(0,200,83,.12),rgba(0,200,83,.04));border:1px solid rgba(0,200,83,.3);color:var(--green);padding:8px 14px;border-radius:2px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-head);letter-spacing:1px;white-space:nowrap;transition:all .2s;text-transform:uppercase}
-.addbtn:hover{box-shadow:0 0 16px rgba(0,200,83,.2)}
-
-.leg{background:rgba(4,16,8,.97);border:1px solid var(--border2);border-radius:4px;padding:16px;grid-column:1/-1}
+/* ── ADDON ── */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.ac{background:rgba(5,11,20,.97);border:1px solid var(--border2);border-radius:4px;overflow:hidden;position:relative}
+.ac::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),transparent);opacity:.4}
+.ach{background:rgba(8,15,26,.9);padding:11px 16px;border-bottom:1px solid var(--border);font-family:var(--fh);font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;justify-content:space-between}
+.acb{padding:14px}
+.lscroll{max-height:280px;overflow-y:auto}
+.li2{display:flex;align-items:center;justify-content:space-between;padding:7px 16px;border-bottom:1px solid rgba(14,32,64,.5);font-size:11px;color:var(--text2);font-family:var(--fb);transition:background .15s}
+.li2:hover{background:rgba(0,240,255,.02)}.li2:last-child{border-bottom:none}
+.rmb{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:0 4px;transition:color .15s}.rmb:hover{color:var(--p0)}
+.addr{padding:10px 16px;display:flex;gap:7px;border-top:1px solid var(--border)}
+.addb{background:linear-gradient(135deg,rgba(0,240,255,.12),rgba(0,240,255,.04));border:1px solid rgba(0,240,255,.3);color:var(--glow);padding:8px 14px;border-radius:2px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:1px;white-space:nowrap;transition:all .2s;text-transform:uppercase}
+.addb:hover{box-shadow:0 0 14px rgba(0,240,255,.2)}
+.leg{background:rgba(5,11,20,.97);border:1px solid var(--border2);border-radius:4px;padding:16px;grid-column:1/-1}
 .legg{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:10px}
-.legi{text-align:center;padding:9px 4px;background:rgba(6,26,10,.9);border-radius:3px;border:1px solid var(--border);transition:all .2s}
-.legi:hover{border-color:var(--border2);background:rgba(0,200,83,.03)}
-.legc{font-family:var(--font-mono);font-size:16px;font-weight:700;margin-bottom:2px}
+.legi{text-align:center;padding:9px 4px;background:rgba(8,15,26,.9);border-radius:3px;border:1px solid var(--border);transition:all .2s}
+.legi:hover{border-color:var(--border2);background:rgba(0,240,255,.02)}
+.legc{font-family:var(--fm);font-size:16px;font-weight:700;margin-bottom:2px}
 .legd{font-size:9px;color:var(--text2)}
 
-/* ══════ MODAL ══════ */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:none;align-items:flex-start;justify-content:center;padding-top:60px;backdrop-filter:blur(4px)}
-.modal-overlay.show{display:flex;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{background:rgba(4,16,8,.99);border:1px solid var(--border2);border-radius:5px;width:660px;max-width:95vw;max-height:82vh;overflow-y:auto;box-shadow:0 0 60px rgba(0,200,83,.1);position:relative}
-.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),var(--gold),transparent)}
-.mhdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(4,16,8,.99);z-index:1}
-.mclose{background:transparent;border:1px solid var(--border2);color:var(--text2);width:26px;height:26px;border-radius:2px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.mclose:hover{border-color:var(--red);color:var(--red)}
+/* ── MODAL ── */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:none;align-items:flex-start;justify-content:center;padding-top:55px;backdrop-filter:blur(4px)}
+.mo.on{display:flex;animation:fadeU .2s ease}
+.mod{background:rgba(5,11,20,.99);border:1px solid var(--border2);border-radius:5px;width:660px;max-width:95vw;max-height:82vh;overflow-y:auto;box-shadow:0 0 60px rgba(0,240,255,.1);position:relative}
+.mod::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),var(--accent2),transparent)}
+.mhdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(5,11,20,.99);z-index:1}
+.mcl{background:transparent;border:1px solid var(--border2);color:var(--text2);width:26px;height:26px;border-radius:2px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s}.mcl:hover{border-color:var(--p0);color:var(--p0)}
 .mbody{padding:18px}
 
-/* ══════ NOTIF ══════ */
-.notif{position:fixed;bottom:20px;right:20px;z-index:999;background:rgba(4,16,8,.99);border:1px solid var(--green);color:var(--green);padding:10px 16px;border-radius:3px;font-size:12px;font-weight:700;font-family:var(--font-head);letter-spacing:1px;transform:translateY(60px);opacity:0;transition:all .3s;box-shadow:0 0 20px rgba(0,200,83,.2);text-shadow:0 0 8px var(--green)}
-.notif.show{transform:translateY(0);opacity:1}
-.notif.err{border-color:var(--red);color:var(--red);text-shadow:0 0 8px var(--red);box-shadow:0 0 20px rgba(255,23,68,.2)}
+/* ── NOTIF ── */
+.notif{position:fixed;bottom:20px;right:20px;z-index:999;background:rgba(5,11,20,.99);border:1px solid var(--glow);color:var(--glow);padding:10px 16px;border-radius:3px;font-size:12px;font-weight:700;font-family:var(--fh);letter-spacing:1px;transform:translateY(60px);opacity:0;transition:all .3s;box-shadow:0 0 20px rgba(0,240,255,.2);text-shadow:0 0 8px var(--glow)}
+.notif.on{transform:translateY(0);opacity:1}
+.notif.err{border-color:var(--p0);color:var(--p0);text-shadow:0 0 8px var(--p0);box-shadow:0 0 20px rgba(255,34,68,.2)}
 
-/* ══════ CORNER DECO ══════ */
-.c-tl,.c-tr,.c-bl,.c-br{position:absolute;width:10px;height:10px;pointer-events:none}
-.c-tl{top:0;left:0;border-top:2px solid var(--green);border-left:2px solid var(--green)}
-.c-tr{top:0;right:0;border-top:2px solid var(--green);border-right:2px solid var(--green)}
-.c-bl{bottom:0;left:0;border-bottom:2px solid var(--green);border-left:2px solid var(--green)}
-.c-br{bottom:0;right:0;border-bottom:2px solid var(--green);border-right:2px solid var(--green)}
-
+/* corners */
+.ctl,.ctr,.cbl,.cbr{position:absolute;width:10px;height:10px;pointer-events:none}
+.ctl{top:0;left:0;border-top:2px solid var(--glow);border-left:2px solid var(--glow)}
+.ctr{top:0;right:0;border-top:2px solid var(--glow);border-right:2px solid var(--glow)}
+.cbl{bottom:0;left:0;border-bottom:2px solid var(--glow);border-left:2px solid var(--glow)}
+.cbr{bottom:0;right:0;border-bottom:2px solid var(--glow);border-right:2px solid var(--glow)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
 </head>
 <body>
 
-<!-- ══════ LANDING SCREEN ══════ -->
+<!-- LANDING -->
 <div id="landing">
-  <canvas id="pitch-canvas"></canvas>
-  <div class="landing-content">
-    <div class="ball-anim"></div>
-    <div class="landing-title">GSBW</div>
-    <div class="landing-sub">Global Step Bug Writer</div>
-    <div class="landing-proj">⚽ FIFA REFACTOR — QA PLATFORM</div>
-    <div class="landing-bar"><div class="landing-bar-fill"></div></div>
-    <div class="landing-loading" id="landing-txt">LOADING PITCH...</div>
+  <canvas id="pc"></canvas>
+  <div class="lc">
+    <div class="ball"></div>
+    <div class="lt">GSBW</div>
+    <div class="ls">Global Step Bug Writer</div>
+    <div class="lp">⚽ FIFA REFACTOR — QA PLATFORM</div>
+    <div class="lbar"><div class="lbf"></div></div>
+    <div class="ltxt" id="ltxt">LOADING...</div>
   </div>
 </div>
 
-<!-- ══════ BACKGROUND ══════ -->
-<canvas id="bg-canvas"></canvas>
-<div class="grass-overlay"></div>
-<div class="vignette"></div>
+<canvas id="bgc"></canvas>
+<div class="scan"></div>
+<div class="vig"></div>
 
-<!-- ══════ APP ══════ -->
 <div id="app">
-  <div class="header">
-    <div class="logo-wrap">
-      <div class="logo-ball"></div>
-      <div>
-        <div class="logo-text">GSBW</div>
-        <div class="logo-sub">GLOBAL STEP BUG WRITER</div>
-      </div>
-      <div class="proj-badge">⚽ FIFA REFACTOR</div>
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="lw">
+      <div class="li"></div>
+      <div><div class="ltx">GSBW</div><div class="lsb">GLOBAL STEP BUG WRITER</div></div>
+      <div class="pb">⚽ FIFA REFACTOR</div>
     </div>
-    <div class="header-nav">
-      <button class="hn-btn active" id="hnw" onclick="showPage('write')">⚡ WRITE BUG</button>
-      <button class="hn-btn" id="hnl" onclick="showPage('log')">📋 BUG LOG</button>
-      <button class="hn-btn" id="hna" onclick="showPage('addon')">🔧 ADD-ON</button>
+    <div class="hnav">
+      <button class="hn on" id="hnw" onclick="showPage('write')">⚡ WRITE BUG</button>
+      <button class="hn" id="hnl" onclick="showPage('log')">📋 BUG LOG</button>
+      <button class="hn" id="hna" onclick="showPage('addon')">🔧 ADD-ON</button>
     </div>
   </div>
 
-  <div class="layout">
-    <div class="sidebar">
+  <div class="lay">
+    <div class="sb">
       <div class="sl">NAVIGATION</div>
-      <button class="nav-item active" id="nav-write" onclick="showPage('write')"><span>⚡</span> WRITE BUG</button>
-      <button class="nav-item" id="nav-log" onclick="showPage('log')"><span>📋</span> BUG LOG</button>
-      <button class="nav-item" id="nav-addon" onclick="showPage('addon')"><span>🔧</span> ADD-ON PANEL</button>
-
+      <button class="ni on" id="nw" onclick="showPage('write')"><span>⚡</span> WRITE BUG</button>
+      <button class="ni" id="nl" onclick="showPage('log')"><span>📋</span> BUG LOG</button>
+      <button class="ni" id="na" onclick="showPage('addon')"><span>🔧</span> ADD-ON PANEL</button>
       <div class="sl">SESSION</div>
-      <div class="stat-block">
-        <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
-        <div class="stat-row"><span style="color:var(--text2);font-size:11px">Bugs today</span><span class="stat-val" id="st1">0</span></div>
-        <div class="stat-row"><span style="color:var(--text2);font-size:11px">Session total</span><span class="stat-val" id="st2">0</span></div>
-        <div class="stat-row"><span style="color:var(--text2);font-size:11px">Auto-delete</span><span class="stat-val" id="st3">12:00:00</span></div>
-        <div class="tbar"><div class="tfill" id="tfill" style="width:100%"></div></div>
+      <div class="stb">
+        <div class="ctl"></div><div class="ctr"></div><div class="cbl"></div><div class="cbr"></div>
+        <div class="sr"><span style="color:var(--text2);font-size:11px">Bugs today</span><span class="sv" id="st1">0</span></div>
+        <div class="sr"><span style="color:var(--text2);font-size:11px">Session total</span><span class="sv" id="st2">0</span></div>
+        <div class="sr"><span style="color:var(--text2);font-size:11px">Auto-delete</span><span class="sv" id="st3">12:00:00</span></div>
+        <div class="tbar"><div class="tf" id="tf" style="width:100%"></div></div>
       </div>
-
       <div class="sl">PRIORITY</div>
-      <div class="pguide">
-        <div class="pg-row"><span class="pg-code" style="color:var(--p0)">P0</span><span style="color:var(--text2)">Critical / Blocker</span></div>
-        <div class="pg-row"><span class="pg-code" style="color:var(--p1)">P1</span><span style="color:var(--text2)">High</span></div>
-        <div class="pg-row"><span class="pg-code" style="color:var(--p2)">P2</span><span style="color:var(--text2)">Medium</span></div>
-        <div class="pg-row"><span class="pg-code" style="color:var(--p3)">P3</span><span style="color:var(--text2)">Low</span></div>
-        <div class="pg-row"><span class="pg-code" style="color:var(--p4)">P4</span><span style="color:var(--text2)">Cosmetic</span></div>
-        <div class="pg-row"><span class="pg-code" style="color:var(--p5)">P5</span><span style="color:var(--text2)">Trivial</span></div>
+      <div class="pg">
+        <div class="pgr"><span class="pgc" style="color:var(--p0)">P0</span><span style="color:var(--text2)">Critical/Blocker</span></div>
+        <div class="pgr"><span class="pgc" style="color:var(--p1)">P1</span><span style="color:var(--text2)">High</span></div>
+        <div class="pgr"><span class="pgc" style="color:var(--p2)">P2</span><span style="color:var(--text2)">Medium</span></div>
+        <div class="pgr"><span class="pgc" style="color:var(--p3)">P3</span><span style="color:var(--text2)">Low</span></div>
+        <div class="pgr"><span class="pgc" style="color:var(--p4)">P4</span><span style="color:var(--text2)">Cosmetic</span></div>
+        <div class="pgr"><span class="pgc" style="color:var(--p5)">P5</span><span style="color:var(--text2)">Trivial</span></div>
       </div>
     </div>
 
     <div class="main">
 
-      <!-- ═══ WRITE PAGE ═══ -->
-      <div class="page active" id="page-write">
-        <div class="ptitle">WRITE NEW BUG</div>
-        <div class="psub">Describe the bug in your own words — AI will auto-detect the parent &amp; component and write the full report in simple, clear English.</div>
+      <!-- WRITE PAGE -->
+      <div class="pg2 on" id="page-write">
+        <div class="pt">WRITE NEW BUG</div>
+        <div class="ps">Describe the bug — AI auto-detects parent &amp; component and writes a clear, simple English report.</div>
         <div class="fg">
-          <div class="fgroup">
-            <label class="flabel">Parent Feature <span class="auto-badge" id="pb" style="display:none"><span class="auto-dot"></span>AUTO-DETECTED</span></label>
-            <select class="fselect" id="sel-parent"></select>
+          <div class="fg1">
+            <label class="fl">Parent Feature <span class="ab" id="pb2" style="display:none"><span class="adc"></span>AUTO</span></label>
+            <select class="fsel" id="sel-parent"></select>
           </div>
-          <div class="fgroup">
-            <label class="flabel">Component <span class="auto-badge" id="cb" style="display:none"><span class="auto-dot"></span>AUTO-DETECTED</span></label>
-            <select class="fselect" id="sel-comp"></select>
+          <div class="fg1">
+            <label class="fl">Component <span class="ab" id="cb2" style="display:none"><span class="adc"></span>AUTO</span></label>
+            <select class="fsel" id="sel-comp"></select>
           </div>
-          <div class="fgroup">
-            <label class="flabel">Platform / Build</label>
-            <input class="finput" id="inp-plat" placeholder="e.g. PS5 Build 1.4.2, PC Dev Build"/>
+          <div class="fg1 full">
+            <label class="fl">Describe the Bug <span style="font-size:9px;color:var(--text3);font-family:var(--fm);margin-left:6px">(write what you saw, in your own words)</span></label>
+            <textarea class="fta big" id="inp-desc" placeholder="Example: When I set up a corner kick, the goalkeeper walks out of the goal area and goes near the corner flag. He never returns to the goal. This happens every time in 5v5 mode. The game becomes unplayable because there is no keeper in goal."></textarea>
           </div>
-          <div class="fgroup">
-            <label class="flabel">Tester Name</label>
-            <input class="finput" id="inp-tester" placeholder="Your name"/>
-          </div>
-          <div class="fgroup full">
-            <label class="flabel">Describe the Bug <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-left:6px">(write in your own words)</span></label>
-            <textarea class="ftarea big" id="inp-desc" placeholder="Example: When the corner kick happens, the goalkeeper walks out of the goal area and just stays near the corner flag. He never goes back to the goal. This happens every time I try a corner in 5v5 mode. The match becomes impossible to play because there is no keeper in goal."></textarea>
-          </div>
-          <div class="fgroup full">
-            <label class="flabel">Steps to Reproduce <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-left:6px">(optional — AI will generate)</span></label>
-            <textarea class="ftarea" id="inp-steps" placeholder="1. Start a match&#10;2. Go to a corner kick&#10;3. Observe... (you can leave this blank)"></textarea>
+          <div class="fg1 full">
+            <label class="fl">Steps to Reproduce <span style="font-size:9px;color:var(--text3);font-family:var(--fm);margin-left:6px">(optional — AI generates if left blank)</span></label>
+            <textarea class="fta" id="inp-steps" placeholder="1. Start a match&#10;2. Go to a corner kick&#10;3. Observe... (leave blank and AI will fill this in)"></textarea>
           </div>
         </div>
-        <button class="btn-ai" id="btn-gen" onclick="generateBug()">
-          <span class="spin-icon">⚙</span> GENERATE BUG REPORT WITH AI
+        <button class="btnai" id="btn-gen" onclick="generateBug()">
+          <span class="spinico">⚙</span> GENERATE BUG REPORT WITH AI
         </button>
-        <div class="out-section" id="out-sec" style="display:none">
-          <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
-          <div class="out-hdr">
-            <div class="out-hdr-l"><div class="odot"></div>AI GENERATED OUTPUT</div>
+        <div class="outs" id="out-sec" style="display:none">
+          <div class="ctl"></div><div class="ctr"></div><div class="cbl"></div><div class="cbr"></div>
+          <div class="outh">
+            <div class="outhl"><div class="odot"></div>AI GENERATED OUTPUT</div>
             <div style="display:flex;gap:6px">
-              <button class="cbtn" onclick="copyOutput()">⎘ COPY ALL</button>
-              <button class="cbtn save" onclick="saveBug()">✚ SAVE TO LOG</button>
+              <button class="cb" onclick="copyOutput()">⎘ COPY ALL</button>
+              <button class="cb sv2" onclick="saveBug()">✚ SAVE TO LOG</button>
             </div>
           </div>
-          <div class="out-body">
-            <div class="loading" id="ldg" style="display:none">
-              <div class="load-ball"></div>
-              <div class="load-txt" id="ldg-txt">ANALYSING BUG...</div>
+          <div class="outb">
+            <div class="ldg" id="ldg" style="display:none">
+              <div class="ldspin"></div>
+              <div class="ldtxt" id="ldtxt">ANALYSING BUG...</div>
             </div>
-            <div class="bug-out" id="bug-out">
+            <div class="bugout" id="bug-out">
               <div class="btitle" id="o-title"></div>
               <div class="tags" id="o-tags"></div>
-              <div class="bsec"><div class="bslabel">SHORT SUMMARY — PICK A VARIATION</div><div class="vgrid" id="o-short"></div></div>
-              <div class="bsec"><div class="bslabel">LONG SUMMARY — PICK A VARIATION</div><div class="vgrid" id="o-long"></div></div>
-              <div class="bsec"><div class="bslabel">STEPS TO REPRODUCE</div><div class="rsteps" id="o-repro"></div></div>
-              <div class="bsec"><div class="bslabel">OBSERVED RESULT</div><div class="obs" id="o-obs"></div></div>
-              <div class="bsec"><div class="bslabel">EXPECTED RESULT</div><div class="exp" id="o-exp"></div></div>
+              <div class="bsec"><div class="bsl">SHORT SUMMARY — PICK ONE VARIATION</div><div class="vgrid" id="o-short"></div></div>
+              <div class="bsec"><div class="bsl">LONG SUMMARY — PICK ONE VARIATION</div><div class="vgrid" id="o-long"></div></div>
+              <div class="bsec"><div class="bsl">STEPS TO REPRODUCE</div><div class="rs" id="o-repro"></div></div>
+              <div class="bsec"><div class="bsl">OBSERVED RESULT</div><div class="obs" id="o-obs"></div></div>
+              <div class="bsec"><div class="bsl">EXPECTED RESULT</div><div class="exp" id="o-exp"></div></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ═══ LOG PAGE ═══ -->
-      <div class="page" id="page-log">
-        <div class="log-hdr">
-          <div><div class="ptitle">BUG LOG</div><div class="psub">All saved bugs — auto-deleted after 12 hours</div></div>
+      <!-- LOG PAGE -->
+      <div class="pg2" id="page-log">
+        <div class="lhdr">
+          <div><div class="pt">BUG LOG</div><div class="ps">All saved bugs — auto-deleted after 12 hours</div></div>
           <div style="display:flex;align-items:center;gap:10px">
-            <span class="bcnt" id="log-cnt">0 BUGS</span>
-            <button class="cbtn" onclick="clearLog()" style="border-color:rgba(255,23,68,.3);color:rgba(255,23,68,.7)">CLEAR ALL</button>
+            <span class="lcnt" id="log-cnt">0 BUGS</span>
+            <button class="cb" onclick="clearLog()" style="border-color:rgba(255,34,68,.3);color:rgba(255,34,68,.7)">CLEAR ALL</button>
           </div>
         </div>
-        <div class="log-table">
-          <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
-          <div class="thdr"><div>#</div><div>BUG TITLE</div><div>COMPONENT</div><div>PRIORITY</div><div>SEVERITY</div><div>TESTER</div><div>TIME</div></div>
+        <div class="ltable">
+          <div class="ctl"></div><div class="ctr"></div><div class="cbl"></div><div class="cbr"></div>
+          <div class="thdr"><div>#</div><div>BUG TITLE</div><div>COMPONENT</div><div>PRIORITY</div><div>SEVERITY</div><div>TIME</div></div>
           <div id="log-body"></div>
         </div>
       </div>
 
-      <!-- ═══ ADDON PAGE ═══ -->
-      <div class="page" id="page-addon">
-        <div class="ptitle">ADD-ON PANEL</div>
-        <div class="psub">Add or remove parents and components used in bug reports.</div>
-        <div class="addon-grid">
-          <div class="acard">
-            <div class="achdr">PARENT FEATURES <span id="pc" style="color:var(--text3);font-size:9px"></span></div>
-            <div class="list-scroll" id="plist"></div>
-            <div class="addrow"><input class="finput" id="inp-np" placeholder="Add new parent..." style="flex:1;font-size:11px;padding:7px 10px"/><button class="addbtn" onclick="addParent()">ADD</button></div>
+      <!-- ADDON PAGE -->
+      <div class="pg2" id="page-addon">
+        <div class="pt">ADD-ON PANEL</div>
+        <div class="ps">Add or remove parents and components. Changes are saved — they will not disappear after refresh.</div>
+        <div class="agrid">
+          <div class="ac">
+            <div class="ach">PARENT FEATURES <span id="pc2" style="color:var(--text3);font-size:9px"></span></div>
+            <div class="lscroll" id="plist"></div>
+            <div class="addr"><input class="fi" id="inp-np" placeholder="New parent name..." style="flex:1;font-size:11px;padding:7px 10px"/><button class="addb" onclick="addParent()">ADD</button></div>
           </div>
-          <div class="acard">
-            <div class="achdr">COMPONENTS <span id="cc" style="color:var(--text3);font-size:9px"></span></div>
-            <div class="list-scroll" id="clist"></div>
-            <div class="addrow"><input class="finput" id="inp-nc" placeholder="Add new component..." style="flex:1;font-size:11px;padding:7px 10px"/><button class="addbtn" onclick="addComp()">ADD</button></div>
+          <div class="ac">
+            <div class="ach">COMPONENTS <span id="cc2" style="color:var(--text3);font-size:9px"></span></div>
+            <div class="lscroll" id="clist"></div>
+            <div class="addr"><input class="fi" id="inp-nc" placeholder="New component name..." style="flex:1;font-size:11px;padding:7px 10px"/><button class="addb" onclick="addComp()">ADD</button></div>
           </div>
           <div class="leg">
-            <div style="font-family:var(--font-head);font-size:10px;font-weight:700;color:var(--text2);letter-spacing:2px">PRIORITY & SEVERITY REFERENCE</div>
+            <div style="font-family:var(--fh);font-size:10px;font-weight:700;color:var(--text2);letter-spacing:2px">PRIORITY & SEVERITY REFERENCE</div>
             <div class="legg">
               <div class="legi"><div class="legc" style="color:var(--p0)">P0</div><div class="legd">Critical</div></div>
               <div class="legi"><div class="legc" style="color:var(--p1)">P1</div><div class="legd">High</div></div>
@@ -550,11 +399,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
 </div>
 
 <!-- MODAL -->
-<div class="modal-overlay" id="mo" onclick="if(event.target===this)this.classList.remove('show')">
-  <div class="modal">
+<div class="mo" id="mo" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="mod">
     <div class="mhdr">
-      <div style="font-family:var(--font-mono);font-size:12px;color:var(--gold)" id="mtitle"></div>
-      <button class="mclose" onclick="document.getElementById('mo').classList.remove('show')">✕</button>
+      <div style="font-family:var(--fm);font-size:12px;color:var(--accent2)" id="mtitle"></div>
+      <button class="mcl" onclick="document.getElementById('mo').classList.remove('on')">✕</button>
     </div>
     <div class="mbody" id="mbody"></div>
   </div>
@@ -562,134 +411,112 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-hei
 <div class="notif" id="notif"></div>
 
 <script>
-// ══════ DATA ══════
-const PARENTS=["Backgrounds","Challenges","Conditions","Crossing","Extras","FIFA WC Squads","Game State System","Jousting","Joustling","Legal","Localization","Locomotion System","Main Menu","Messaging","Multiplayer - Local","Optimization","Options","Overlays","Penalty Kicks","Penalty Shootout","Statistics","Substitution System","Tackles","Tactics System","Throw-Ins","Trapping","User Profile","Voice Chat","World Cup Live","World Cup Tournament (Offline)","Goalkeeper","Stadium","Players","Celebration System","Sidelines","Auto Marking","Roaster","Referees","Crash","Controls","Physics system","HUD","Shooting","Cinematics","Passing","Free Kick","Defense","Corner Kick","Camera System","Rules","Core Gameplay","Difficulty System","National teams","Audio Systems","Formations System","Skill Move System"];
-const COMPS=["AI Voice Cloning","Air Intercept System","Assets","Attributes","Audio (Commentary)","Audio (Sound Effects)","Audio (Soundtrack)","Auto-Marking","Backend","Backgrounds","Ball State","Camera","Celebrations","Cinematics","Collision","Corner Kicks","Controller Select","Crossing","Crowds","CSDK","Debug Controls","Defense","Difficulty","Dribbling","Edit Profile","Exhibition","Facial Animation System","Fixed Update","Goalkeeper","Formations","Fouls","Free Kicks","Free Training","Free Training Hub","Friends","FTUE","Game State System","Gameplay Loop","Goal Kick","Half-Time","Headers","HUD","In-Game Autoplay","Injuries","Input Mediator","Jockeying","Jousting","Kicking","Kickoff","Kit Select","Kits","Leaderboards","Lighting","Live Challenges","Live Events","Localization","Locomotion","Main Menu","Managers","Match Prediction","Match Stats","Memory Optimization","Multiplayer - Infrastructure","Multiplayer - Online","Passing","Pause Menu","Penalties","Penalty Kicks","Physics","Player Behavior","Player Positioning","Player Roles","Polish","Post-Game","Practice","Pre-Game","Referees","Replay","Rewards","Rosters","Rules","Settings","Shooting","Sidelines","Skill Moves","Sprint","Squad Management","Stadiums","Standings","Substitution","Team Management","Team Select","Tactics","World Cup Predictions","Penalty Shootout","Animation","In-Match UI"];
+// ═══════════════════════════════════════
+// BASE DATA
+// ═══════════════════════════════════════
+const BASE_PARENTS=["Backgrounds","Challenges","Conditions","Crossing","Extras","FIFA WC Squads","Game State System","Jousting","Joustling","Legal","Localization","Locomotion System","Main Menu","Messaging","Multiplayer - Local","Optimization","Options","Overlays","Penalty Kicks","Penalty Shootout","Statistics","Substitution System","Tackles","Tactics System","Throw-Ins","Trapping","User Profile","Voice Chat","World Cup Live","World Cup Tournament (Offline)","Goalkeeper","Stadium","Players","Celebration System","Sidelines","Auto Marking","Roaster","Referees","Crash","Controls","Physics system","HUD","Shooting","Cinematics","Passing","Free Kick","Defense","Corner Kick","Camera System","Rules","Core Gameplay","Difficulty System","National teams","Audio Systems","Formations System","Skill Move System"];
+const BASE_COMPS=["AI Voice Cloning","Air Intercept System","Assets","Attributes","Audio (Commentary)","Audio (Sound Effects)","Audio (Soundtrack)","Auto-Marking","Backend","Backgrounds","Ball State","Camera","Celebrations","Cinematics","Collision","Corner Kicks","Controller Select","Crossing","Crowds","CSDK","Debug Controls","Defense","Difficulty","Dribbling","Edit Profile","Exhibition","Facial Animation System","Fixed Update","Goalkeeper","Formations","Fouls","Free Kicks","Free Training","Free Training Hub","Friends","FTUE","Game State System","Gameplay Loop","Goal Kick","Half-Time","Headers","HUD","In-Game Autoplay","Injuries","Input Mediator","Jockeying","Jousting","Kicking","Kickoff","Kit Select","Kits","Leaderboards","Lighting","Live Challenges","Live Events","Localization","Locomotion","Main Menu","Managers","Match Prediction","Match Stats","Memory Optimization","Multiplayer - Infrastructure","Multiplayer - Online","Passing","Pause Menu","Penalties","Penalty Kicks","Physics","Player Behavior","Player Positioning","Player Roles","Polish","Post-Game","Practice","Pre-Game","Referees","Replay","Rewards","Rosters","Rules","Settings","Shooting","Sidelines","Skill Moves","Sprint","Squad Management","Stadiums","Standings","Substitution","Team Management","Team Select","Tactics","World Cup Predictions","Penalty Shootout","Animation","In-Match UI"];
 
-let parents=[...PARENTS],comps=[...COMPS];
+let customParents=[],customComps=[];
+let parents=[],comps=[];
 let bugLog=[],currentBug=null,sessionStart=Date.now();
 
-// ══════ LANDING ANIMATION ══════
+// ═══════════════════════════════════════
+// PERSISTENT STORAGE — load from server
+// ═══════════════════════════════════════
+async function loadPersisted(){
+  try{
+    const r=await fetch('/api/data');
+    const d=await r.json();
+    customParents=d.customParents||[];
+    customComps=d.customComps||[];
+  }catch(e){
+    // fallback to localStorage if server unavailable
+    try{customParents=JSON.parse(localStorage.getItem('gsbw_parents')||'[]');customComps=JSON.parse(localStorage.getItem('gsbw_comps')||'[]')}catch(e2){}
+  }
+  parents=[...BASE_PARENTS,...customParents];
+  comps=[...BASE_COMPS,...customComps];
+}
+
+async function persistData(){
+  const d={customParents,customComps};
+  try{
+    await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+  }catch(e){}
+  // also save to localStorage as backup
+  try{localStorage.setItem('gsbw_parents',JSON.stringify(customParents));localStorage.setItem('gsbw_comps',JSON.stringify(customComps))}catch(e){}
+}
+
+// ═══════════════════════════════════════
+// LANDING ANIMATION
+// ═══════════════════════════════════════
 (function(){
-  const canvas=document.getElementById('pitch-canvas');
-  const ctx=canvas.getContext('2d');
+  const canvas=document.getElementById('pc'),ctx=canvas.getContext('2d');
   canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const w=canvas.width,h=canvas.height;
 
-  // Draw football pitch
+  // Pitch lines
   function drawPitch(){
-    const w=canvas.width,h=canvas.height;
     ctx.clearRect(0,0,w,h);
-
-    // Grass stripes
-    for(let i=0;i<20;i++){
-      ctx.fillStyle=i%2===0?'rgba(0,60,10,0.6)':'rgba(0,40,8,0.6)';
-      ctx.fillRect(i*(w/20),0,w/20,h);
-    }
-
-    // Pitch lines
-    ctx.strokeStyle='rgba(255,255,255,0.15)';
-    ctx.lineWidth=2;
-
-    // Outline
-    const px=w*.08,py=h*.1,pw=w*.84,ph=h*.8;
+    for(let i=0;i<18;i++){ctx.fillStyle=i%2===0?'rgba(0,30,60,.7)':'rgba(0,20,45,.7)';ctx.fillRect(i*(w/18),0,w/18,h)}
+    ctx.strokeStyle='rgba(0,240,255,0.12)';ctx.lineWidth=1.5;
+    const px=w*.07,py=h*.1,pw=w*.86,ph=h*.8;
     ctx.strokeRect(px,py,pw,ph);
-
-    // Centre line
     ctx.beginPath();ctx.moveTo(w/2,py);ctx.lineTo(w/2,py+ph);ctx.stroke();
-
-    // Centre circle
-    ctx.beginPath();ctx.arc(w/2,h/2,h*.12,0,Math.PI*2);ctx.stroke();
-
-    // Centre spot
-    ctx.fillStyle='rgba(255,255,255,0.3)';
-    ctx.beginPath();ctx.arc(w/2,h/2,4,0,Math.PI*2);ctx.fill();
-
-    // Penalty areas
-    const paW=pw*.25,paH=ph*.45;
+    ctx.beginPath();ctx.arc(w/2,h/2,h*.13,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle='rgba(0,240,255,0.3)';ctx.beginPath();ctx.arc(w/2,h/2,4,0,Math.PI*2);ctx.fill();
+    const paW=pw*.26,paH=ph*.44;
     ctx.strokeRect(px,h/2-paH/2,paW,paH);
     ctx.strokeRect(px+pw-paW,h/2-paH/2,paW,paH);
-
-    // Goal areas
-    const gaW=pw*.1,gaH=ph*.22;
-    ctx.strokeRect(px,h/2-gaH/2,gaW,gaH);
-    ctx.strokeRect(px+pw-gaW,h/2-gaH/2,gaW,gaH);
-
-    // Corner arcs
-    const cr=h*.03;
-    [[px,py],[px+pw,py],[px,py+ph],[px+pw,py+ph]].forEach(([cx,cy],i)=>{
-      const sa=[0,Math.PI/2,Math.PI*3/2,Math.PI][i];
-      ctx.beginPath();ctx.arc(cx,cy,cr,sa,sa+Math.PI/2);ctx.stroke();
-    });
-
-    // Penalty spots
-    ctx.fillStyle='rgba(255,255,255,0.3)';
-    ctx.beginPath();ctx.arc(px+paW*.65,h/2,4,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(px+pw-paW*.65,h/2,4,0,Math.PI*2);ctx.fill();
-
-    // Glow overlay
     const grd=ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,h*.6);
-    grd.addColorStop(0,'rgba(0,200,83,0.08)');
-    grd.addColorStop(1,'transparent');
+    grd.addColorStop(0,'rgba(0,240,255,0.06)');grd.addColorStop(1,'transparent');
     ctx.fillStyle=grd;ctx.fillRect(0,0,w,h);
   }
   drawPitch();
 
-  // Animate ball rolling across pitch
-  let ballX=-50,ballY=0,ballAngle=0;
-  ballY=canvas.height/2;
-  const msgs=['LOADING PITCH...','BOOTING ENGINE...','PREPARING BUG WRITER...','KICK OFF!'];
-  let msgIdx=0;
-  const msgEl=document.getElementById('landing-txt');
+  const msgs=['LOADING PITCH...','BOOTING BUG ENGINE...','PREPARING WORKSPACE...','KICK OFF! ⚽'];
+  let mi=0;const el=document.getElementById('ltxt');
+  const iv=setInterval(()=>{mi=(mi+1)%msgs.length;el.textContent=msgs[mi]},1100);
 
-  const interval=setInterval(()=>{
-    msgIdx=(msgIdx+1)%msgs.length;
-    msgEl.textContent=msgs[msgIdx];
-  },1000);
-
-  // Auto-dismiss after 4.8s
   setTimeout(()=>{
-    clearInterval(interval);
-    msgEl.textContent='KICK OFF! ⚽';
-    const landing=document.getElementById('landing');
-    landing.classList.add('hide');
-    setTimeout(()=>{
-      landing.style.display='none';
-      document.getElementById('app').classList.add('visible');
-    },800);
+    clearInterval(iv);
+    document.getElementById('landing').classList.add('out');
+    setTimeout(()=>{document.getElementById('landing').style.display='none';document.getElementById('app').classList.add('vis')},800);
   },4800);
 })();
 
-// ══════ BACKGROUND CANVAS ══════
+// ═══════════════════════════════════════
+// BACKGROUND CANVAS
+// ═══════════════════════════════════════
 (function(){
-  const c=document.getElementById('bg-canvas');
-  const ctx=c.getContext('2d');
+  const c=document.getElementById('bgc'),ctx=c.getContext('2d');
   c.width=window.innerWidth;c.height=window.innerHeight;
   window.addEventListener('resize',()=>{c.width=window.innerWidth;c.height=window.innerHeight});
-  const pts=Array.from({length:50},()=>({
-    x:Math.random()*c.width,y:Math.random()*c.height,
-    vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,
-    r:Math.random()*1.2+.4,a:Math.random()*.3+.05
-  }));
+  const pts=Array.from({length:55},()=>({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:Math.random()*1.3+.4,a:Math.random()*.35+.06,col:Math.random()>.6?'255,107,0':'0,240,255'}));
   function draw(){
     ctx.clearRect(0,0,c.width,c.height);
     pts.forEach(p=>{
       p.x+=p.vx;p.y+=p.vy;
       if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;
       if(p.y<0)p.y=c.height;if(p.y>c.height)p.y=0;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(0,200,83,${p.a})`;ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${p.col},${p.a})`;ctx.fill();
     });
     for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
       const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<90){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,200,83,${.04*(1-d/90)})`;ctx.lineWidth=.5;ctx.stroke()}
+      if(d<95){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,240,255,${.05*(1-d/95)})`;ctx.lineWidth=.5;ctx.stroke()}
     }
     requestAnimationFrame(draw);
   }
   draw();
 })();
 
-// ══════ INIT ══════
-function init(){fillSelects();renderAddon();renderLog();startTimer();}
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+async function init(){
+  await loadPersisted();
+  fillSelects();renderAddon();renderLog();startTimer();
+}
 
 function fillSelects(){
   const sp=document.getElementById('sel-parent'),sc=document.getElementById('sel-comp');
@@ -699,60 +526,80 @@ function fillSelects(){
 
 function showPage(p){
   ['write','log','addon'].forEach(n=>{
-    document.getElementById('page-'+n).classList.toggle('active',n===p);
-    document.getElementById('nav-'+n).classList.toggle('active',n===p);
+    document.getElementById('page-'+n).classList.toggle('on',n===p);
+    document.getElementById('n'+n[0]).classList.toggle('on',n===p);
     const m={write:'hnw',log:'hnl',addon:'hna'};
-    if(document.getElementById(m[n]))document.getElementById(m[n]).classList.toggle('active',n===p);
+    document.getElementById(m[n]).classList.toggle('on',n===p);
   });
 }
 
-// ══════ LOADING MESSAGES ══════
-const loadMsgs=['ANALYSING BUG REPORT...','DETECTING PARENT & COMPONENT...','WRITING IN SIMPLE ENGLISH...','GENERATING REPRO STEPS...','SETTING PRIORITY & SEVERITY...'];
+// ═══════════════════════════════════════
+// GENERATE BUG
+// ═══════════════════════════════════════
+const loadMsgs=['ANALYSING BUG REPORT...','AUTO-DETECTING PARENT & COMPONENT...','WRITING CLEAR ENGLISH REPORT...','GENERATING REPRO STEPS...','ASSIGNING PRIORITY & SEVERITY...'];
 let lmIdx=0,lmInt;
-function startLoad(){document.getElementById('ldg-txt').textContent=loadMsgs[0];lmIdx=1;lmInt=setInterval(()=>{document.getElementById('ldg-txt').textContent=loadMsgs[lmIdx%loadMsgs.length];lmIdx++;},1800)}
+function startLoad(){document.getElementById('ldtxt').textContent=loadMsgs[0];lmIdx=1;lmInt=setInterval(()=>{document.getElementById('ldtxt').textContent=loadMsgs[lmIdx%loadMsgs.length];lmIdx++},1800)}
 function stopLoad(){clearInterval(lmInt)}
 
-// ══════ GENERATE BUG ══════
 async function generateBug(){
   const desc=document.getElementById('inp-desc').value.trim();
-  if(!desc){notify('PLEASE DESCRIBE THE BUG FIRST',true);return;}
+  if(!desc){notify('PLEASE DESCRIBE THE BUG FIRST',true);return}
   const parent=document.getElementById('sel-parent').value;
   const comp=document.getElementById('sel-comp').value;
-  const plat=document.getElementById('inp-plat').value;
   const steps=document.getElementById('inp-steps').value;
 
   document.getElementById('out-sec').style.display='block';
   document.getElementById('ldg').style.display='block';
   document.getElementById('bug-out').classList.remove('vis');
   const btn=document.getElementById('btn-gen');
-  btn.disabled=true;
-  startLoad();
+  btn.disabled=true;startLoad();
 
-  const prompt=`You are a professional Game QA bug writer for "FIFA Refactor" (a football/soccer video game).
+  const prompt=`You are a senior Game QA engineer writing bug reports for "FIFA Refactor" (a football/soccer video game).
 
-RULES:
-- Write everything in simple, clear, everyday English. No complex words. Easy to read.
-- Short summaries: 2 lines max, straight to the point.
-- Long summaries: MINIMUM 4 lines and at least 40 words. Describe the bug, when it happens, what the impact is, and any extra context.
-- If parent or component is not selected, auto-detect the best match from the lists.
-- Repro steps: clear numbered steps a junior tester can follow.
-- Observed: start with "Observe that" — describe exactly what goes wrong.
-- Expected: start with "Expected that" — describe what should happen instead.
+STRICT RULES — follow every rule exactly:
 
-Parent Selected: ${parent||'NOT SELECTED - auto-detect'}
-Component Selected: ${comp||'NOT SELECTED - auto-detect'}
-Platform: ${plat||'Not specified'}
+1. TITLE FORMAT: Must be exactly: [PARENT] Component - Short summary sentence
+   - [PARENT] in uppercase square brackets
+   - Component name as-is
+   - Hyphen separator
+   - Short summary: sentence case (only first word capitalised, rest lowercase unless proper noun)
+   - Example: [GOALKEEPER] Corner Kicks - Goalkeeper exits goal area and does not return during corner kick situations
+
+2. SHORT SUMMARIES:
+   - Each must be ONE single continuous paragraph (no bullet points, no line breaks)
+   - Each must be at least 15 words
+   - Written in simple, plain English — easy for anyone to understand
+   - All 3 variations must be clearly different from each other (different wording, different angle, different focus)
+   - Do NOT split into sub-points
+
+3. LONG SUMMARIES:
+   - Each must be ONE single continuous paragraph (no bullet points, no line breaks, no sub-headings)
+   - Minimum 40 words per variation
+   - Describe: what the bug is, when it happens, how to trigger it, what the impact is on gameplay
+   - Written in simple plain English
+   - All 3 variations must be clearly different from each other — different structure, different focus, different words
+   - Do NOT split into sub-points or sections
+
+4. REPRO STEPS: Clear numbered steps, simple English, a junior tester can follow them
+
+5. OBSERVED: Start with "Observe that" — describe exactly what goes wrong in simple words
+
+6. EXPECTED: Start with "Expected that" — describe what should happen in simple words
+
+7. AUTO-DETECT: If parent or component not provided, pick the best match from the lists
+
+Parent Selected: ${parent||'NOT SELECTED - auto-detect from description'}
+Component Selected: ${comp||'NOT SELECTED - auto-detect from description'}
 Bug Description: ${desc}
-Steps Provided: ${steps||'None - generate from description'}
-
+Steps Provided: ${steps||'None - generate logical steps'}
 Available Parents: ${parents.join(', ')}
 Available Components: ${comps.join(', ')}
 
-Respond ONLY with this JSON, no markdown, no extra text:
-{"title":"[PARENT] Component - Short clear description of the bug","parent":"exact parent name from list","component":"exact component name from list","priority":"P0 or P1 or P2 or P3 or P4 or P5","severity":"S1 or S2 or S3 or S4","priority_reason":"one simple sentence explaining why","short_summaries":["clear 2-line variation 1","clear 2-line variation 2","clear 2-line variation 3"],"long_summaries":["4+ line variation 1 - minimum 40 words, explain the bug, when it happens, its impact, and any extra detail","4+ line variation 2 - different angle, minimum 40 words","4+ line variation 3 - more technical detail, minimum 40 words"],"repro_steps":["Step 1","Step 2","Step 3","Step 4","Step 5"],"observed":"Observe that [exact broken behaviour in simple words]","expected":"Expected that [correct behaviour in simple words]","auto_parent":${!parent},"auto_comp":${!comp}}`;
+Respond ONLY with this exact JSON structure, no markdown, no code fences, nothing else:
+{"title":"[PARENT] Component - Short summary sentence with sentence case","parent":"exact parent from list","component":"exact component from list","priority":"P0 or P1 or P2 or P3 or P4 or P5","severity":"S1 or S2 or S3 or S4","priority_reason":"one short plain English sentence explaining the priority","short_summaries":["variation 1 - single paragraph at least 15 words, simple English","variation 2 - completely different wording and angle, at least 15 words","variation 3 - different focus again, at least 15 words"],"long_summaries":["variation 1 - single paragraph minimum 40 words, no sub-points, plain English","variation 2 - completely different paragraph minimum 40 words, different angle","variation 3 - different paragraph minimum 40 words, more technical focus"],"repro_steps":["Step 1: action","Step 2: action","Step 3: action","Step 4: action","Step 5: observe"],"observed":"Observe that [exact broken behaviour in simple words]","expected":"Expected that [correct behaviour in simple words]","auto_parent":${!parent},"auto_comp":${!comp}}`;
 
   try{
-    const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1600,messages:[{role:'user',content:prompt}]})});
+    const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1800,messages:[{role:'user',content:prompt}]})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'Server error '+r.status)}
     const data=await r.json();
     if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
@@ -761,22 +608,22 @@ Respond ONLY with this JSON, no markdown, no extra text:
     const bug=JSON.parse(clean);
     currentBug=bug;
 
-    // Auto-select dropdowns
+    // Auto-select dropdowns and show badge
     if(bug.auto_parent&&bug.parent){
       const sp=document.getElementById('sel-parent');
       for(let i=0;i<sp.options.length;i++){if(sp.options[i].text===bug.parent){sp.selectedIndex=i;break}}
-      document.getElementById('pb').style.display='inline-flex';
+      document.getElementById('pb2').style.display='inline-flex';
     }
     if(bug.auto_comp&&bug.component){
       const sc=document.getElementById('sel-comp');
       for(let i=0;i<sc.options.length;i++){if(sc.options[i].text===bug.component){sc.selectedIndex=i;break}}
-      document.getElementById('cb').style.display='inline-flex';
+      document.getElementById('cb2').style.display='inline-flex';
     }
 
     stopLoad();renderBug(bug);
   }catch(e){
     stopLoad();
-    document.getElementById('ldg').innerHTML=`<div style="color:var(--red);font-family:var(--font-mono);font-size:12px">⚠ ERROR: ${e.message}</div><div style="color:var(--text3);font-size:11px;margin-top:8px">Make sure the server is running: <span style="color:var(--green)">npm start</span></div>`;
+    document.getElementById('ldg').innerHTML=`<div style="color:var(--p0);font-family:var(--fm);font-size:12px">⚠ ERROR: ${e.message}</div><div style="color:var(--text3);font-size:11px;margin-top:8px">Make sure the server is running: <span style="color:var(--accent3)">npm start</span></div>`;
   }
   btn.disabled=false;
 }
@@ -785,87 +632,180 @@ function renderBug(b){
   document.getElementById('ldg').style.display='none';
   document.getElementById('bug-out').classList.add('vis');
   document.getElementById('o-title').textContent=b.title;
-  const pc='tag-'+b.priority.toLowerCase(),sc='tag-'+b.severity.toLowerCase();
-  document.getElementById('o-tags').innerHTML=`<span class="tag tp">${b.parent}</span><span class="tag tc">${b.component}</span><span class="tag ${pc}">${b.priority}</span><span class="tag ${sc}">${b.severity}</span><span style="font-size:10px;color:var(--text3);align-self:center;margin-left:4px;font-family:var(--font-mono)">${b.priority_reason||''}</span>`;
-  document.getElementById('o-short').innerHTML=b.short_summaries.map((s,i)=>`<div class="vcard" onclick="selVar(this,'short',${i})"><div class="vnum">// VARIATION ${i+1}</div><div class="vtxt">${s}</div></div>`).join('');
-  document.getElementById('o-long').innerHTML=b.long_summaries.map((s,i)=>`<div class="vcard" onclick="selVar(this,'long',${i})"><div class="vnum">// VARIATION ${i+1}</div><div class="vtxt">${s}</div></div>`).join('');
-  document.getElementById('o-repro').innerHTML=b.repro_steps.map((s,i)=>`<div class="rstep"><div class="rnum">${i+1}</div><div>${s}</div></div>`).join('');
+  const pc='tp'+b.priority[1],sc='ts'+b.severity[1];
+  document.getElementById('o-tags').innerHTML=
+    `<span class="tag tp">${b.parent}</span>`+
+    `<span class="tag tc">${b.component}</span>`+
+    `<span class="tag ${pc}">${b.priority}</span>`+
+    `<span class="tag ${sc}">${b.severity}</span>`+
+    `<span style="font-size:10px;color:var(--text3);align-self:center;margin-left:4px;font-family:var(--fm)">${b.priority_reason||''}</span>`;
+  document.getElementById('o-short').innerHTML=b.short_summaries.map((s,i)=>
+    `<div class="vc" onclick="selVar(this,'short',${i})"><div class="vn">// VARIATION ${i+1}</div><div class="vt">${s}</div></div>`
+  ).join('');
+  document.getElementById('o-long').innerHTML=b.long_summaries.map((s,i)=>
+    `<div class="vc" onclick="selVar(this,'long',${i})"><div class="vn">// VARIATION ${i+1}</div><div class="vt">${s}</div></div>`
+  ).join('');
+  document.getElementById('o-repro').innerHTML=b.repro_steps.map((s,i)=>
+    `<div class="rsi"><div class="rsn">${i+1}</div><div>${s}</div></div>`
+  ).join('');
   document.getElementById('o-obs').textContent=b.observed;
   document.getElementById('o-exp').textContent=b.expected;
 }
 
-function selVar(el,type,idx){el.parentElement.querySelectorAll('.vcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');if(currentBug)currentBug['sel_'+type]=idx}
+function selVar(el,type,idx){
+  el.parentElement.querySelectorAll('.vc').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  if(currentBug)currentBug['sel_'+type]=idx;
+}
 
 function copyOutput(){
   if(!currentBug){notify('NO OUTPUT TO COPY',true);return}
   const si=currentBug.sel_short??0,li=currentBug.sel_long??0;
-  const txt=[currentBug.title,`Priority: ${currentBug.priority} | Severity: ${currentBug.severity}`,`Parent: ${currentBug.parent} | Component: ${currentBug.component}`,'','SHORT SUMMARY:',currentBug.short_summaries[si],'','LONG SUMMARY:',currentBug.long_summaries[li],'','STEPS TO REPRODUCE:',...currentBug.repro_steps.map((s,i)=>`${i+1}. ${s}`),'',`OBSERVED: ${currentBug.observed}`,`EXPECTED: ${currentBug.expected}`].join('\n');
+  const txt=[
+    currentBug.title,
+    `Priority: ${currentBug.priority} | Severity: ${currentBug.severity}`,
+    `Parent: ${currentBug.parent} | Component: ${currentBug.component}`,
+    '',
+    'SHORT SUMMARY:',currentBug.short_summaries[si],
+    '',
+    'LONG SUMMARY:',currentBug.long_summaries[li],
+    '',
+    'STEPS TO REPRODUCE:',
+    ...currentBug.repro_steps.map((s,i)=>`${i+1}. ${s}`),
+    '',
+    `OBSERVED: ${currentBug.observed}`,
+    `EXPECTED: ${currentBug.expected}`
+  ].join('\n');
   navigator.clipboard.writeText(txt).then(()=>notify('COPIED TO CLIPBOARD!'));
 }
 
 function saveBug(){
   if(!currentBug){notify('GENERATE A BUG FIRST',true);return}
-  const tester=document.getElementById('inp-tester').value||'Anonymous';
-  bugLog.unshift({id:bugLog.length+1,...currentBug,tester,time:new Date(),expiry:Date.now()+12*3600000});
+  bugLog.unshift({id:bugLog.length+1,...currentBug,time:new Date(),expiry:Date.now()+12*3600000});
   document.getElementById('st1').textContent=bugLog.length;
   document.getElementById('st2').textContent=bugLog.length;
   renderLog();notify('BUG SAVED TO LOG!');
 }
 
+// ═══════════════════════════════════════
+// BUG LOG
+// ═══════════════════════════════════════
 function renderLog(){
   const body=document.getElementById('log-body');
   document.getElementById('log-cnt').textContent=bugLog.length+' BUG'+(bugLog.length!==1?'S':'');
-  if(!bugLog.length){body.innerHTML='<div class="empty"><div class="empty-icon">⚽</div><div class="empty-txt">NO BUGS LOGGED YET</div><div class="empty-sub">write and save your first bug report</div></div>';return}
+  if(!bugLog.length){
+    body.innerHTML='<div class="empty"><div class="emptyi">🐛</div><div class="emptyt">NO BUGS LOGGED YET</div><div style="font-size:11px;font-family:var(--fm);color:var(--text3)">write and save your first bug report</div></div>';
+    return;
+  }
   body.innerHTML=bugLog.map(b=>{
-    const pc='tag-'+b.priority.toLowerCase(),sc='tag-'+b.severity.toLowerCase();
+    const pc='tp'+b.priority[1],sc='ts'+b.severity[1];
     const t=b.time,ts=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
-    return `<div class="trow" onclick="openBug(${b.id})"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">#${b.id}</div><div class="rtitle">${b.title}</div><div style="font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.component||''}</div><div><span class="tag ${pc}" style="font-size:9px;padding:2px 5px">${b.priority}</span></div><div><span class="tag ${sc}" style="font-size:9px;padding:2px 5px">${b.severity}</span></div><div style="font-size:10px;color:var(--text2)">${b.tester}</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">${ts}</div></div>`;
+    return `<div class="trow" onclick="openBug(${b.id})">
+      <div style="font-family:var(--fm);font-size:10px;color:var(--text3)">#${b.id}</div>
+      <div class="rtitle">${b.title}</div>
+      <div style="font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.component||''}</div>
+      <div><span class="tag ${pc}" style="font-size:9px;padding:2px 5px">${b.priority}</span></div>
+      <div><span class="tag ${sc}" style="font-size:9px;padding:2px 5px">${b.severity}</span></div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--text3)">${ts}</div>
+    </div>`;
   }).join('');
 }
 
 function openBug(id){
   const b=bugLog.find(x=>x.id===id);if(!b)return;
-  const pc='tag-'+b.priority.toLowerCase(),sc='tag-'+b.severity.toLowerCase();
+  const pc='tp'+b.priority[1],sc='ts'+b.severity[1];
   document.getElementById('mtitle').textContent=b.title;
-  document.getElementById('mbody').innerHTML=`<div class="tags" style="margin-bottom:14px"><span class="tag tp">${b.parent}</span><span class="tag tc">${b.component}</span><span class="tag ${pc}">${b.priority}</span><span class="tag ${sc}">${b.severity}</span></div><div class="bsec"><div class="bslabel">SHORT SUMMARY</div><div style="font-size:12px;color:var(--text);line-height:1.7;font-family:var(--font-body)">${b.short_summaries[b.sel_short??0]}</div></div><div class="bsec"><div class="bslabel">LONG SUMMARY</div><div style="font-size:12px;color:var(--text);line-height:1.7;font-family:var(--font-body)">${b.long_summaries[b.sel_long??0]}</div></div><div class="bsec"><div class="bslabel">STEPS TO REPRODUCE</div><div class="rsteps">${b.repro_steps.map((s,i)=>`<div class="rstep"><div class="rnum">${i+1}</div><div>${s}</div></div>`).join('')}</div></div><div class="bsec"><div class="bslabel">OBSERVED</div><div class="obs">${b.observed}</div></div><div class="bsec"><div class="bslabel">EXPECTED</div><div class="exp">${b.expected}</div></div><div style="font-size:10px;color:var(--text3);margin-top:12px;font-family:var(--font-mono)">REPORTED BY ${b.tester.toUpperCase()} — ${b.time.toLocaleTimeString()}</div>`;
-  document.getElementById('mo').classList.add('show');
+  document.getElementById('mbody').innerHTML=`
+    <div class="tags" style="margin-bottom:14px">
+      <span class="tag tp">${b.parent}</span><span class="tag tc">${b.component}</span>
+      <span class="tag ${pc}">${b.priority}</span><span class="tag ${sc}">${b.severity}</span>
+    </div>
+    <div class="bsec"><div class="bsl">SHORT SUMMARY</div><div style="font-size:12px;color:var(--text);line-height:1.75;font-family:var(--fb)">${b.short_summaries[b.sel_short??0]}</div></div>
+    <div class="bsec"><div class="bsl">LONG SUMMARY</div><div style="font-size:12px;color:var(--text);line-height:1.75;font-family:var(--fb)">${b.long_summaries[b.sel_long??0]}</div></div>
+    <div class="bsec"><div class="bsl">STEPS TO REPRODUCE</div><div class="rs">${b.repro_steps.map((s,i)=>`<div class="rsi"><div class="rsn">${i+1}</div><div>${s}</div></div>`).join('')}</div></div>
+    <div class="bsec"><div class="bsl">OBSERVED</div><div class="obs">${b.observed}</div></div>
+    <div class="bsec"><div class="bsl">EXPECTED</div><div class="exp">${b.expected}</div></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:12px;font-family:var(--fm)">LOGGED ${b.time.toLocaleTimeString()}</div>
+  `;
+  document.getElementById('mo').classList.add('on');
 }
 
 function clearLog(){bugLog=[];renderLog();notify('LOG CLEARED')}
 
+// ═══════════════════════════════════════
+// ADDON — persistent
+// ═══════════════════════════════════════
 function renderAddon(){
-  document.getElementById('pc').textContent='('+parents.length+')';
-  document.getElementById('cc').textContent='('+comps.length+')';
-  document.getElementById('plist').innerHTML=[...parents].sort().map(p=>`<div class="litem"><span>${p}</span><button class="rmbtn" onclick="rmP('${esc(p)}')">✕</button></div>`).join('');
-  document.getElementById('clist').innerHTML=[...comps].sort().map(c=>`<div class="litem"><span>${c}</span><button class="rmbtn" onclick="rmC('${esc(c)}')">✕</button></div>`).join('');
+  document.getElementById('pc2').textContent='('+parents.length+')';
+  document.getElementById('cc2').textContent='('+comps.length+')';
+  document.getElementById('plist').innerHTML=[...parents].sort().map(p=>{
+    const isCustom=customParents.includes(p);
+    return `<div class="li2"><span>${p}${isCustom?' <span style="color:var(--accent3);font-size:9px;font-family:var(--fm)">[custom]</span>':''}</span>${isCustom?`<button class="rmb" onclick="rmP('${esc(p)}')">✕</button>`:'<span style="font-size:9px;color:var(--text3)">base</span>'}</div>`;
+  }).join('');
+  document.getElementById('clist').innerHTML=[...comps].sort().map(c=>{
+    const isCustom=customComps.includes(c);
+    return `<div class="li2"><span>${c}${isCustom?' <span style="color:var(--accent3);font-size:9px;font-family:var(--fm)">[custom]</span>':''}</span>${isCustom?`<button class="rmb" onclick="rmC('${esc(c)}')">✕</button>`:'<span style="font-size:9px;color:var(--text3)">base</span>'}</div>`;
+  }).join('');
 }
-function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
-function addParent(){const v=document.getElementById('inp-np').value.trim();if(!v||parents.includes(v))return;parents.push(v);document.getElementById('inp-np').value='';renderAddon();fillSelects();notify('PARENT ADDED')}
-function rmP(p){parents=parents.filter(x=>x!==p);renderAddon();fillSelects()}
-function addComp(){const v=document.getElementById('inp-nc').value.trim();if(!v||comps.includes(v))return;comps.push(v);document.getElementById('inp-nc').value='';renderAddon();fillSelects();notify('COMPONENT ADDED')}
-function rmC(c){comps=comps.filter(x=>x!==c);renderAddon();fillSelects()}
 
+function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+
+async function addParent(){
+  const v=document.getElementById('inp-np').value.trim();
+  if(!v||parents.includes(v)){notify('ALREADY EXISTS OR EMPTY',true);return}
+  customParents.push(v);parents=[...BASE_PARENTS,...customParents];
+  document.getElementById('inp-np').value='';
+  await persistData();renderAddon();fillSelects();
+  notify('PARENT SAVED: '+v.toUpperCase());
+}
+
+async function rmP(p){
+  customParents=customParents.filter(x=>x!==p);parents=[...BASE_PARENTS,...customParents];
+  await persistData();renderAddon();fillSelects();notify('REMOVED');
+}
+
+async function addComp(){
+  const v=document.getElementById('inp-nc').value.trim();
+  if(!v||comps.includes(v)){notify('ALREADY EXISTS OR EMPTY',true);return}
+  customComps.push(v);comps=[...BASE_COMPS,...customComps];
+  document.getElementById('inp-nc').value='';
+  await persistData();renderAddon();fillSelects();
+  notify('COMPONENT SAVED: '+v.toUpperCase());
+}
+
+async function rmC(c){
+  customComps=customComps.filter(x=>x!==c);comps=[...BASE_COMPS,...customComps];
+  await persistData();renderAddon();fillSelects();notify('REMOVED');
+}
+
+// ═══════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════
 function startTimer(){
   const D=12*3600000;
   setInterval(()=>{
     const rem=Math.max(0,D-(Date.now()-sessionStart));
     const h=Math.floor(rem/3600000),m=Math.floor((rem%3600000)/60000),s=Math.floor((rem%60000)/1000);
     document.getElementById('st3').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-    document.getElementById('tfill').style.width=(rem/D*100)+'%';
+    document.getElementById('tf').style.width=(rem/D*100)+'%';
     const before=bugLog.length;bugLog=bugLog.filter(b=>Date.now()<b.expiry);
     if(bugLog.length!==before)renderLog();
     if(rem===0)sessionStart=Date.now();
   },1000);
 }
 
+// ═══════════════════════════════════════
+// NOTIFY
+// ═══════════════════════════════════════
 function notify(msg,isErr=false){
   const n=document.getElementById('notif');
   n.textContent=msg;n.className='notif'+(isErr?' err':'');
-  n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2600);
+  n.classList.add('on');setTimeout(()=>n.classList.remove('on'),2600);
 }
 
-document.getElementById('sel-parent').addEventListener('change',()=>document.getElementById('pb').style.display='none');
-document.getElementById('sel-comp').addEventListener('change',()=>document.getElementById('cb').style.display='none');
+// auto-badge hide on manual change
+document.getElementById('sel-parent').addEventListener('change',()=>document.getElementById('pb2').style.display='none');
+document.getElementById('sel-comp').addEventListener('change',()=>document.getElementById('cb2').style.display='none');
 
 init();
 </script>
