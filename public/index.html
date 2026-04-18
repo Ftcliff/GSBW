@@ -25,7 +25,7 @@
 #pc{position:absolute;inset:0}
 .lc{position:relative;z-index:2;text-align:center;animation:lIn .7s ease .3s both}
 @keyframes lIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-.ball{width:88px;height:88px;margin:0 auto 26px;background:radial-gradient(circle at 35% 32%,#fff 0%,#ccc 45%,#888 100%);border-radius:50%;position:relative;animation:bSpin 2s linear infinite,bBounce 1s ease-in-out infinite alternate;box-shadow:0 0 40px rgba(0,240,255,.45),0 8px 28px rgba(0,0,0,.7)}
+.ball-wrap{animation:bBounce 1s ease-in-out infinite alternate;margin:0 auto 26px;width:88px}.ball{width:88px;height:88px;background:radial-gradient(circle at 35% 32%,#fff 0%,#ccc 45%,#888 100%);border-radius:50%;position:relative;animation:bSpin 2s linear infinite;box-shadow:0 0 40px rgba(0,240,255,.45),0 8px 28px rgba(0,0,0,.7)}
 @keyframes bSpin{to{transform:rotate(360deg)}}
 @keyframes bBounce{from{transform:translateY(0) rotate(0)}to{transform:translateY(-16px) rotate(180deg)}}
 .ball::before{content:'';position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(rgba(0,0,0,.18) 0deg 36deg,transparent 36deg 72deg)}
@@ -37,7 +37,7 @@
 .lp{margin-top:18px;font-family:var(--fm);font-size:12px;color:var(--gold);letter-spacing:3px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.3);padding:6px 20px;border-radius:2px;display:inline-block;animation:pglow 1.5s ease-in-out infinite}
 @keyframes pglow{0%,100%{box-shadow:0 0 8px rgba(255,214,0,.2)}50%{box-shadow:0 0 20px rgba(255,214,0,.5)}}
 .lbar{width:200px;height:3px;background:var(--border2);border-radius:2px;margin:26px auto 0;overflow:hidden}
-.lbf{height:100%;background:linear-gradient(90deg,var(--glow),var(--gold),var(--glow));border-radius:2px;width:0%;animation:barfill 4.5s ease forwards .5s}
+.lbf{height:100%;background:linear-gradient(90deg,var(--glow),var(--gold),var(--glow));border-radius:2px;width:0%;animation:barfill 3.5s ease forwards .3s}
 @keyframes barfill{to{width:100%}}
 .ltxt{font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:2px;margin-top:9px;animation:blink2 1s ease-in-out infinite}
 @keyframes blink2{0%,100%{opacity:.4}50%{opacity:1}}
@@ -227,6 +227,58 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .cbl{bottom:0;left:0;border-bottom:2px solid var(--glow);border-left:2px solid var(--glow)}
 .cbr{bottom:0;right:0;border-bottom:2px solid var(--glow);border-right:2px solid var(--glow)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── MUSIC CARDS ── */
+.mcard{background:rgba(8,15,26,.9);border:1px solid var(--border2);border-radius:6px;padding:14px;transition:all .22s;position:relative;overflow:hidden;cursor:default}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(170,68,255,.6),transparent);opacity:0;transition:opacity .2s}
+.mcard:hover{border-color:rgba(170,68,255,.35);background:rgba(170,68,255,.04);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.mcard:hover::before{opacity:1}
+.mcard-art{width:56px;height:56px;border-radius:4px;background:linear-gradient(135deg,rgba(170,68,255,.2),rgba(0,240,255,.1));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;border:1px solid var(--border2)}
+.mcard-art img{width:100%;height:100%;object-fit:cover;border-radius:3px}
+.mcard-title{font-size:13px;font-weight:600;color:var(--text);font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.mcard-artist{font-size:11px;color:var(--text2);font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
+.mcard-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.mchip{padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;font-family:var(--fm);letter-spacing:.5px}
+.mchip-lang{background:rgba(0,240,255,.08);color:var(--glow);border:1px solid rgba(0,240,255,.2)}
+.mchip-yr{background:rgba(255,214,0,.08);color:var(--gold);border:1px solid rgba(255,214,0,.2)}
+.mchip-genre{background:rgba(170,68,255,.08);color:#aa44ff;border:1px solid rgba(170,68,255,.2)}
+.mcard-links{display:flex;gap:6px;flex-wrap:wrap}
+.mlink{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:2px;font-size:10px;font-weight:700;font-family:var(--fh);letter-spacing:.8px;cursor:pointer;transition:all .2s;text-decoration:none;border:1px solid;text-transform:uppercase}
+.mlink-sp{background:rgba(30,215,96,.08);color:#1ed760;border-color:rgba(30,215,96,.25)}.mlink-sp:hover{background:rgba(30,215,96,.15);box-shadow:0 0 10px rgba(30,215,96,.2)}
+.mlink-yt{background:rgba(255,0,0,.08);color:#ff4444;border-color:rgba(255,0,0,.25)}.mlink-yt:hover{background:rgba(255,0,0,.15);box-shadow:0 0 10px rgba(255,0,0,.2)}
+.mlink-jio{background:rgba(255,107,0,.08);color:var(--accent2);border-color:rgba(255,107,0,.25)}.mlink-jio:hover{background:rgba(255,107,0,.15);box-shadow:0 0 10px rgba(255,107,0,.2)}
+.mlink-gl{background:rgba(66,133,244,.08);color:#4285f4;border-color:rgba(66,133,244,.25)}.mlink-gl:hover{background:rgba(66,133,244,.15);box-shadow:0 0 10px rgba(66,133,244,.2)}
+.genre-chip{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border2);color:var(--text2);background:transparent;font-family:var(--fh);letter-spacing:.5px}
+.genre-chip:hover{border-color:rgba(170,68,255,.4);color:#aa44ff}
+.genre-chip.active{background:rgba(170,68,255,.12);border-color:rgba(170,68,255,.5);color:#aa44ff;box-shadow:0 0 10px rgba(170,68,255,.15)}
+.no-results{text-align:center;padding:50px 20px;color:var(--text3);font-family:var(--fm);font-size:13px}
+
+
+/* ── MUSIC PLAYER ── */
+.mcard{background:rgba(8,15,26,.92);border:1px solid var(--border2);border-radius:5px;padding:12px;transition:all .2s;position:relative;overflow:hidden}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(170,68,255,.5),transparent);opacity:0;transition:opacity .2s}
+.mcard:hover{border-color:rgba(170,68,255,.3);background:rgba(170,68,255,.03);transform:translateY(-1px)}
+.mcard:hover::before{opacity:1}
+.mcard.playing{border-color:rgba(170,68,255,.5);background:rgba(170,68,255,.06)}
+.mcard.playing::before{opacity:1;animation:hl 1.5s ease-in-out infinite}
+.mart{width:52px;height:52px;border-radius:4px;background:linear-gradient(135deg,rgba(170,68,255,.2),rgba(0,240,255,.1));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden;border:1px solid var(--border2)}
+.mart img{width:100%;height:100%;object-fit:cover;border-radius:3px}
+.mttl{font-size:13px;font-weight:600;color:var(--text);font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.mart2{font-size:11px;color:var(--text2);font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:7px}
+.mchip{padding:2px 7px;border-radius:2px;font-size:9px;font-weight:700;font-family:var(--fm);letter-spacing:.4px;background:rgba(170,68,255,.08);color:#aa44ff;border:1px solid rgba(170,68,255,.2);margin-right:4px}
+.mbtn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:2px;font-size:10px;font-weight:700;font-family:var(--fh);letter-spacing:.8px;cursor:pointer;transition:all .2s;border:1px solid;text-transform:uppercase;background:transparent}
+.mbtn-play{color:#aa44ff;border-color:rgba(170,68,255,.35)}.mbtn-play:hover{background:rgba(170,68,255,.12);box-shadow:0 0 10px rgba(170,68,255,.2)}
+.mbtn-q{color:var(--glow);border-color:rgba(0,240,255,.3)}.mbtn-q:hover{background:rgba(0,240,255,.08)}
+.mbtn-playing{color:#cc88ff;border-color:rgba(170,68,255,.6);background:rgba(170,68,255,.15);animation:btnPulse 1.5s ease-in-out infinite}
+@keyframes btnPulse{0%,100%{box-shadow:0 0 8px rgba(170,68,255,.3)}50%{box-shadow:0 0 16px rgba(170,68,255,.6)}}
+.eq-anim{display:inline-flex;align-items:flex-end;gap:2px;height:14px;margin-right:4px}
+.eq-bar{width:3px;background:#cc88ff;border-radius:1px;animation:eqb .6s ease-in-out infinite alternate}
+.eq-bar:nth-child(2){animation-delay:.2s}.eq-bar:nth-child(3){animation-delay:.4s}
+@keyframes eqb{from{height:3px}to{height:12px}}
+.q-item{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid rgba(14,32,64,.5);font-size:11px;color:var(--text2);transition:background .15s;cursor:pointer}
+.q-item:hover{background:rgba(170,68,255,.04)}.q-item.q-active{background:rgba(170,68,255,.08);color:#cc88ff}
+.q-item:last-child{border-bottom:none}
+
 </style>
 </head>
 <body>
@@ -235,7 +287,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 <div id="landing">
   <canvas id="pc"></canvas>
   <div class="lc">
-    <div class="ball"></div>
+    <div class="ball-wrap"><div class="ball"></div></div>
     <div class="lt">GSBW</div>
     <div class="ls">Global Step Bug Writer</div>
     <div class="lp">⚽ FIFA REFACTOR — QA PLATFORM</div>
@@ -260,6 +312,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
       <button class="hn on" id="hnw" onclick="showPage('write')">⚡ WRITE BUG</button>
       <button class="hn" id="hnl" onclick="showPage('log')">📋 BUG LOG</button>
       <button class="hn" id="hna" onclick="showPage('addon')">🔧 ADD-ON</button>
+      <button class="hn" id="hnm" onclick="showPage('music')" style="border-color:rgba(170,68,255,.4);color:#aa44ff">🎵 MUSIC</button>
     </div>
   </div>
 
@@ -269,6 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
       <button class="ni on" id="nw" onclick="showPage('write')"><span>⚡</span> WRITE BUG</button>
       <button class="ni" id="nl" onclick="showPage('log')"><span>📋</span> BUG LOG</button>
       <button class="ni" id="na" onclick="showPage('addon')"><span>🔧</span> ADD-ON PANEL</button>
+      <button class="ni" id="nm" onclick="showPage('music')" style="color:#aa44ff"><span>🎵</span> MUSIC</button>
       <div class="sl">SESSION</div>
       <div class="stb">
         <div class="ctl"></div><div class="ctr"></div><div class="cbl"></div><div class="cbr"></div>
@@ -394,9 +448,132 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+      <!-- MUSIC PAGE -->
+      <div class="pg2" id="page-music">
+        <!-- LOGIN GATE -->
+        <div id="music-gate">
+          <div style="max-width:420px;margin:60px auto;text-align:center">
+            <div style="font-size:52px;margin-bottom:18px;animation:bSpin 3s linear infinite;display:inline-block">🎵</div>
+            <div class="pt" style="background:linear-gradient(90deg,#fff,#aa44ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px">MUSIC ZONE</div>
+            <div class="ps">Private music player — enter password to access</div>
+            <div style="background:rgba(8,15,26,.95);border:1px solid rgba(170,68,255,.3);border-radius:6px;padding:28px;position:relative;margin-top:8px">
+              <div class="ctl" style="border-color:#aa44ff"></div><div class="ctr" style="border-color:#aa44ff"></div><div class="cbl" style="border-color:#aa44ff"></div><div class="cbr" style="border-color:#aa44ff"></div>
+              <div class="fg1" style="margin-bottom:14px;text-align:left">
+                <label class="fl" style="color:rgba(170,68,255,.7)">PASSWORD</label>
+                <input class="fi" type="password" id="music-pass" placeholder="Enter password..." onkeydown="if(event.key==='Enter')musicLogin()" style="font-size:14px;padding:11px 14px;border-color:rgba(170,68,255,.3)"/>
+              </div>
+              <button onclick="musicLogin()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(170,68,255,.18),rgba(170,68,255,.06));border:1px solid rgba(170,68,255,.5);border-radius:3px;color:#cc88ff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:2px;text-transform:uppercase;transition:all .2s">🔓 ENTER MUSIC ZONE</button>
+              <div id="gate-err" style="color:var(--p0);font-size:11px;font-family:var(--fm);margin-top:10px;display:none;text-align:center">⚠ Wrong password</div>
+              <div style="margin-top:14px;font-size:10px;color:var(--text3);font-family:var(--fm);text-align:center">Default password: <span style="color:#aa44ff">music123</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MUSIC CONTENT -->
+        <div id="music-zone" style="display:none">
+          <!-- Hidden YouTube player (audio only — video hidden) -->
+          <div id="yt-player-wrap" style="position:fixed;bottom:90px;right:20px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;z-index:-1">
+            <div id="yt-player"></div>
+          </div>
+
+          <!-- BOTTOM PLAYER BAR -->
+          <div id="player-bar" style="position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(4,8,20,.98);border-top:1px solid rgba(170,68,255,.35);padding:0 20px;height:76px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(20px)">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#aa44ff,var(--glow),#aa44ff,transparent);animation:hl 3s ease-in-out infinite"></div>
+            <!-- Song info -->
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1">
+              <div id="pb-art" style="width:46px;height:46px;border-radius:4px;background:linear-gradient(135deg,rgba(170,68,255,.3),rgba(0,240,255,.1));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid rgba(170,68,255,.3);overflow:hidden">🎵</div>
+              <div style="min-width:0">
+                <div id="pb-title" style="font-size:13px;font-weight:600;color:var(--text);font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">No song playing</div>
+                <div id="pb-artist" style="font-size:11px;color:var(--text2);font-family:var(--fb);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px"></div>
+              </div>
+            </div>
+            <!-- Controls -->
+            <div style="display:flex;align-items:center;gap:6px">
+              <button onclick="playPrev()" title="Previous" style="background:transparent;border:1px solid var(--border2);color:var(--text2);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.borderColor='#aa44ff';this.style.color='#aa44ff'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">⏮</button>
+              <button onclick="togglePlay()" id="play-btn" title="Play/Pause" style="background:linear-gradient(135deg,rgba(170,68,255,.25),rgba(170,68,255,.1));border:1px solid rgba(170,68,255,.5);color:#cc88ff;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:18px;transition:all .2s;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(170,68,255,.2)">▶</button>
+              <button onclick="playNext()" title="Next" style="background:transparent;border:1px solid var(--border2);color:var(--text2);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.borderColor='#aa44ff';this.style.color='#aa44ff'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">⏭</button>
+            </div>
+            <!-- Progress -->
+            <div style="flex:2;display:flex;align-items:center;gap:8px;min-width:0">
+              <span id="pb-cur" style="font-family:var(--fm);font-size:10px;color:var(--text3);min-width:32px">0:00</span>
+              <div id="prog-track" onclick="seekTo(event)" style="flex:1;height:4px;background:var(--border2);border-radius:2px;cursor:pointer;position:relative">
+                <div id="prog-fill" style="height:100%;background:linear-gradient(90deg,#aa44ff,var(--glow));border-radius:2px;width:0%;transition:width .5s linear;pointer-events:none"></div>
+                <div id="prog-thumb" style="position:absolute;top:50%;right:calc(100% - 0%);transform:translate(50%,-50%);width:10px;height:10px;border-radius:50%;background:#cc88ff;box-shadow:0 0 6px #aa44ff;pointer-events:none"></div>
+              </div>
+              <span id="pb-dur" style="font-family:var(--fm);font-size:10px;color:var(--text3);min-width:32px">0:00</span>
+            </div>
+            <!-- Volume & extras -->
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px">🔊</span>
+              <input type="range" id="vol-slider" min="0" max="100" value="80" oninput="setVolume(this.value)" style="width:70px;accent-color:#aa44ff;cursor:pointer"/>
+              <button onclick="toggleQueue()" title="Queue" style="background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-family:var(--fh);letter-spacing:1px;transition:all .2s" onmouseover="this.style.borderColor='#aa44ff';this.style.color='#aa44ff'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">QUEUE <span id="q-cnt" style="color:#aa44ff">0</span></button>
+              <button onclick="musicLogout()" style="background:transparent;border:1px solid rgba(255,34,68,.25);color:rgba(255,34,68,.5);padding:5px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-family:var(--fh);letter-spacing:1px;transition:all .2s" onmouseover="this.style.borderColor='var(--p0)';this.style.color='var(--p0)'" onmouseout="this.style.borderColor='rgba(255,34,68,.25)';this.style.color='rgba(255,34,68,.5)'">🔒 EXIT</button>
+            </div>
+          </div>
+
+          <!-- QUEUE PANEL -->
+          <div id="queue-panel" style="display:none;position:fixed;bottom:76px;right:20px;width:320px;background:rgba(5,10,22,.98);border:1px solid rgba(170,68,255,.3);border-radius:6px;z-index:499;max-height:380px;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+              <span style="font-family:var(--fh);font-size:11px;font-weight:700;color:#aa44ff;letter-spacing:2px">QUEUE</span>
+              <button onclick="clearQueue()" style="background:transparent;border:none;color:var(--text3);font-size:10px;cursor:pointer;font-family:var(--fh);letter-spacing:1px" onmouseover="this.style.color='var(--p0)'" onmouseout="this.style.color='var(--text3)'">CLEAR ALL</button>
+            </div>
+            <div id="queue-list" style="overflow-y:auto;max-height:320px;padding:8px 0"></div>
+          </div>
+
+          <!-- SEARCH AREA -->
+          <div style="padding-bottom:90px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div>
+                <div class="pt" style="background:linear-gradient(90deg,#fff,#aa44ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🎵 MUSIC ZONE</div>
+                <div class="ps">Search any song — plays audio right here, no video, no ads</div>
+              </div>
+            </div>
+
+            <!-- Search bar -->
+            <div style="display:flex;gap:10px;margin-bottom:18px">
+              <div style="position:relative;flex:1">
+                <input class="fi" id="msearch" placeholder="Search song, artist... e.g. Kesariya, Arijit Singh, Shape of You, Pachtaoge" style="width:100%;font-size:13px;padding:11px 14px 11px 42px" onkeydown="if(event.key==='Enter')doSearch()"/>
+                <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">🔍</span>
+              </div>
+              <select class="fsel" id="mlang" style="font-size:11px;padding:0 10px;min-width:110px">
+                <option value="">All Languages</option>
+                <option value="hindi">Hindi</option>
+                <option value="english">English</option>
+                <option value="marathi">Marathi</option>
+                <option value="punjabi">Punjabi</option>
+                <option value="tamil">Tamil</option>
+                <option value="telugu">Telugu</option>
+                <option value="kannada">Kannada</option>
+                <option value="bengali">Bengali</option>
+              </select>
+              <button onclick="doSearch()" style="padding:0 18px;background:linear-gradient(135deg,rgba(170,68,255,.15),rgba(170,68,255,.05));border:1px solid rgba(170,68,255,.4);border-radius:2px;color:#aa44ff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:1px;white-space:nowrap;transition:all .2s">SEARCH</button>
+            </div>
+
+            <!-- Quick genre pills -->
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px">
+              <span style="font-size:10px;color:var(--text3);font-family:var(--fm);align-self:center;margin-right:4px">QUICK:</span>
+              <script>
+              ['Bollywood Hits','Arijit Singh','Lo-fi Study','90s Hindi','English Pop','Punjabi Hits','Tamil Beats','Devotional','Party Mix','Sad Songs'].forEach(g=>{
+                document.write(`<button onclick="quickSearch('${g}')" style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:transparent;font-family:var(--fh);letter-spacing:.5px;transition:all .2s" onmouseover="this.style.borderColor='rgba(170,68,255,.4)';this.style.color='#aa44ff'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">${g}</button>`);
+              });
+              </script>
+            </div>
+
+            <!-- Results -->
+            <div id="mload" style="display:none;text-align:center;padding:40px;font-family:var(--fm);font-size:12px;color:var(--text2)">
+              <div style="display:inline-block;width:28px;height:28px;border:2px solid var(--border2);border-top-color:#aa44ff;border-radius:50%;animation:spini .8s linear infinite;margin-bottom:12px"></div>
+              <div style="animation:blink2 1.5s infinite" id="mload-txt">SEARCHING...</div>
+            </div>
+            <div id="mresults"></div>
+
+            <!-- Trending default -->
+            <div id="mtrending">
+              <div style="font-family:var(--fh);font-size:10px;font-weight:700;color:var(--text3);letter-spacing:2px;margin-bottom:14px;display:flex;align-items:center;gap:8px">🔥 TRENDING <span style="flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)"></span></div>
+              <div id="tgrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
 <!-- MODAL -->
 <div class="mo" id="mo" onclick="if(event.target===this)this.classList.remove('on')">
@@ -475,14 +652,27 @@ async function persistData(){
   drawPitch();
 
   const msgs=['LOADING PITCH...','BOOTING BUG ENGINE...','PREPARING WORKSPACE...','KICK OFF! ⚽'];
-  let mi=0;const el=document.getElementById('ltxt');
-  const iv=setInterval(()=>{mi=(mi+1)%msgs.length;el.textContent=msgs[mi]},1100);
+  let mi=0;
+  const ltxtEl=document.getElementById('ltxt');
+  const iv=setInterval(()=>{mi=(mi+1)%msgs.length;if(ltxtEl)ltxtEl.textContent=msgs[mi];},1000);
 
-  setTimeout(()=>{
+  function dismissLanding(){
     clearInterval(iv);
-    document.getElementById('landing').classList.add('out');
-    setTimeout(()=>{document.getElementById('landing').style.display='none';document.getElementById('app').classList.add('vis')},800);
-  },4800);
+    const lnd=document.getElementById('landing');
+    const ap=document.getElementById('app');
+    if(!lnd||!ap) return;
+    lnd.classList.add('out');
+    setTimeout(()=>{
+      lnd.style.display='none';
+      ap.classList.add('vis');
+    },800);
+  }
+
+  // Auto-dismiss after 4 seconds
+  setTimeout(dismissLanding, 4000);
+
+  // Also allow clicking to skip
+  document.getElementById('landing').addEventListener('click', dismissLanding);
 })();
 
 // ═══════════════════════════════════════
@@ -525,12 +715,15 @@ function fillSelects(){
 }
 
 function showPage(p){
-  ['write','log','addon'].forEach(n=>{
+  ['write','log','addon','music'].forEach(n=>{
     document.getElementById('page-'+n).classList.toggle('on',n===p);
-    document.getElementById('n'+n[0]).classList.toggle('on',n===p);
-    const m={write:'hnw',log:'hnl',addon:'hna'};
-    document.getElementById(m[n]).classList.toggle('on',n===p);
+    const ni=document.getElementById('n'+n[0]);
+    if(ni)ni.classList.toggle('on',n===p);
+    const m={write:'hnw',log:'hnl',addon:'hna',music:'hnm'};
+    const hb=document.getElementById(m[n]);
+    if(hb)hb.classList.toggle('on',n===p);
   });
+  if(p==='music'&&!musicLoggedIn){document.getElementById('music-gate').style.display='block';document.getElementById('music-zone').style.display='none';}
 }
 
 // ═══════════════════════════════════════
@@ -808,6 +1001,356 @@ document.getElementById('sel-parent').addEventListener('change',()=>document.get
 document.getElementById('sel-comp').addEventListener('change',()=>document.getElementById('cb2').style.display='none');
 
 init();
+
+// ═══════════════════════════════════════
+// MUSIC ZONE
+// ═══════════════════════════════════════
+const MUSIC_PASS = 'music123';
+let musicLoggedIn = false;
+
+
+// ═══════════════════════════════════════
+// MUSIC ZONE — YouTube Audio Player
+// ═══════════════════════════════════════
+const MUSIC_PASSWORD = 'music123';
+let musicLoggedIn = false;
+let ytPlayer = null;
+let ytReady = false;
+let queue = [];
+let queueIdx = -1;
+let isPlaying = false;
+let progTimer = null;
+let currentVideoId = null;
+
+// Load YouTube IFrame API
+(function(){
+  const s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(s);
+})();
+
+window.onYouTubeIframeAPIReady = function(){
+  ytPlayer = new YT.Player('yt-player',{
+    height:'1', width:'1',
+    playerVars:{autoplay:0,controls:0,disablekb:1,fs:0,iv_load_policy:3,modestbranding:1,rel:0,showinfo:0},
+    events:{
+      onReady: ()=>{ ytReady=true; ytPlayer.setVolume(80); },
+      onStateChange: (e)=>{
+        if(e.data===YT.PlayerState.PLAYING){ isPlaying=true; document.getElementById('play-btn').textContent='⏸'; startProgTimer(); updatePlayingCard(); }
+        else if(e.data===YT.PlayerState.PAUSED){ isPlaying=false; document.getElementById('play-btn').textContent='▶'; }
+        else if(e.data===YT.PlayerState.ENDED){ playNext(); }
+      }
+    }
+  });
+};
+
+function musicLogin(){
+  const p = document.getElementById('music-pass').value;
+  if(p === MUSIC_PASSWORD){
+    musicLoggedIn = true;
+    document.getElementById('music-gate').style.display = 'none';
+    document.getElementById('music-zone').style.display = 'block';
+    renderTrending();
+  } else {
+    document.getElementById('gate-err').style.display = 'block';
+    document.getElementById('music-pass').style.borderColor = 'var(--p0)';
+    setTimeout(()=>{ document.getElementById('music-pass').style.borderColor = ''; }, 1500);
+  }
+}
+
+function musicLogout(){
+  musicLoggedIn = false;
+  if(ytPlayer && ytReady) ytPlayer.stopVideo();
+  isPlaying = false;
+  queue = []; queueIdx = -1;
+  document.getElementById('music-gate').style.display = 'block';
+  document.getElementById('music-zone').style.display = 'none';
+  document.getElementById('music-pass').value = '';
+  document.getElementById('gate-err').style.display = 'none';
+  updatePlayerBar(null);
+}
+
+// ── SEARCH ──────────────────────────────
+async function doSearch(){
+  const q = document.getElementById('msearch').value.trim();
+  const lang = document.getElementById('mlang').value;
+  if(!q){ notify('TYPE A SONG NAME FIRST', true); return; }
+  const query = lang ? q + ' ' + lang : q;
+  await runSearch(query);
+}
+
+function quickSearch(term){
+  document.getElementById('msearch').value = term;
+  runSearch(term);
+}
+
+async function runSearch(query){
+  document.getElementById('mtrending').style.display = 'none';
+  document.getElementById('mresults').innerHTML = '';
+  document.getElementById('mload').style.display = 'block';
+  document.getElementById('mload-txt').textContent = 'SEARCHING "' + query.toUpperCase() + '"...';
+
+  try {
+    // Use iTunes Search API (free, no key, returns YouTube-searchable metadata)
+    const url = 'https://itunes.apple.com/search?term=' + encodeURIComponent(query) + '&media=music&limit=20&entity=song';
+    const r = await fetch(url);
+    const data = await r.json();
+    document.getElementById('mload').style.display = 'none';
+
+    if(!data.results || !data.results.length){
+      document.getElementById('mresults').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);font-family:var(--fm)">🎵 No results for "' + query + '"<br><span style="font-size:11px;margin-top:6px;display:block">Try a different spelling</span></div>';
+      return;
+    }
+
+    const songs = data.results.map(t => ({
+      title: t.trackName,
+      artist: t.artistName,
+      album: t.collectionName || '',
+      year: t.releaseDate ? t.releaseDate.slice(0,4) : '',
+      genre: t.primaryGenreName || '',
+      art: t.artworkUrl100 ? t.artworkUrl100.replace('100x100bb','300x300bb') : null,
+      ytQuery: t.trackName + ' ' + t.artistName + ' official audio'
+    }));
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px';
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'grid-column:1/-1;font-family:var(--fh);font-size:10px;font-weight:700;color:var(--text3);letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:8px';
+    hdr.innerHTML = '🎵 RESULTS — ' + songs.length + ' SONGS <span style="flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)"></span>';
+    grid.appendChild(hdr);
+    songs.forEach((s,i) => grid.appendChild(buildMCard(s, i)));
+    document.getElementById('mresults').innerHTML = '';
+    document.getElementById('mresults').appendChild(grid);
+  } catch(e){
+    document.getElementById('mload').style.display = 'none';
+    document.getElementById('mresults').innerHTML = '<div style="text-align:center;padding:40px;color:var(--p0);font-family:var(--fm)">⚠ Search error: ' + e.message + '</div>';
+  }
+}
+
+function buildMCard(s, idx){
+  const id = 'mc-' + Date.now() + '-' + idx;
+  const div = document.createElement('div');
+  div.className = 'mcard'; div.id = id;
+  const artHtml = s.art ? `<img src="${s.art}" alt="" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
+  div.innerHTML = `
+    <div style="display:flex;gap:11px;align-items:flex-start">
+      <div class="mart">${artHtml}</div>
+      <div style="flex:1;min-width:0">
+        <div class="mttl" title="${s.title}">${s.title}</div>
+        <div class="mart2">${s.artist}${s.album ? ' • ' + s.album : ''}</div>
+        <div style="margin-bottom:8px">
+          ${s.genre ? `<span class="mchip">${s.genre}</span>` : ''}
+          ${s.year ? `<span class="mchip" style="background:rgba(255,214,0,.08);color:var(--gold);border-color:rgba(255,214,0,.2)">${s.year}</span>` : ''}
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="mbtn mbtn-play" id="pbtn-${id}" onclick="playFromCard('${id}','${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.art||''}','${s.ytQuery.replace(/'/g,"\\'")}')">▶ PLAY</button>
+          <button class="mbtn mbtn-q" onclick="addToQueue('${s.title.replace(/'/g,"\\'")}','${s.artist.replace(/'/g,"\\'")}','${s.art||''}','${s.ytQuery.replace(/'/g,"\\'")}');notify('ADDED TO QUEUE')">+ QUEUE</button>
+        </div>
+      </div>
+    </div>`;
+  return div;
+}
+
+// ── PLAY ──────────────────────────────────
+let currentCardId = null;
+
+async function playFromCard(cardId, title, artist, art, ytQuery){
+  currentCardId = cardId;
+  updatePlayerBar({title, artist, art});
+  const vid = await searchYouTube(ytQuery);
+  if(!vid){ notify('COULD NOT FIND ON YOUTUBE', true); return; }
+  currentVideoId = vid;
+  queue = [{title, artist, art, ytQuery, vid}];
+  queueIdx = 0;
+  loadAndPlay(vid);
+  updatePlayingCard();
+  updateQueuePanel();
+}
+
+async function searchYouTube(query){
+  // Use YouTube oEmbed / noembed to find video ID via search suggestion
+  // We use a public CORS proxy to hit YouTube's internal suggestion API
+  try{
+    const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+    // Since we can't scrape YT directly, use Invidious public API (open source YT frontend)
+    const inv = `https://iv.ggtyler.dev/api/v1/search?q=${encodeURIComponent(query)}&type=video&page=1`;
+    const r = await fetch(inv);
+    if(!r.ok) throw new Error('inv fail');
+    const d = await r.json();
+    if(d && d[0] && d[0].videoId) return d[0].videoId;
+  } catch(e){}
+  // Fallback: try another public Invidious instance
+  try{
+    const inv2 = `https://invidious.nerdvpn.de/api/v1/search?q=${encodeURIComponent(query)}&type=video`;
+    const r2 = await fetch(inv2);
+    if(!r2.ok) throw new Error('inv2 fail');
+    const d2 = await r2.json();
+    if(d2 && d2[0] && d2[0].videoId) return d2[0].videoId;
+  } catch(e2){}
+  return null;
+}
+
+function loadAndPlay(videoId){
+  if(!ytReady){ setTimeout(()=>loadAndPlay(videoId), 500); return; }
+  ytPlayer.loadVideoById(videoId);
+  ytPlayer.setVolume(document.getElementById('vol-slider').value);
+}
+
+function togglePlay(){
+  if(!ytReady || !currentVideoId){ notify('SEARCH AND PLAY A SONG FIRST', true); return; }
+  if(isPlaying){ ytPlayer.pauseVideo(); }
+  else { ytPlayer.playVideo(); }
+}
+
+function playNext(){
+  if(queueIdx < queue.length - 1){
+    queueIdx++;
+    const s = queue[queueIdx];
+    updatePlayerBar(s);
+    loadAndPlay(s.vid);
+    updateQueuePanel();
+  }
+}
+
+function playPrev(){
+  if(queueIdx > 0){
+    queueIdx--;
+    const s = queue[queueIdx];
+    updatePlayerBar(s);
+    loadAndPlay(s.vid);
+    updateQueuePanel();
+  } else if(ytReady){
+    ytPlayer.seekTo(0);
+  }
+}
+
+function setVolume(v){ if(ytPlayer && ytReady) ytPlayer.setVolume(parseInt(v)); }
+
+function seekTo(e){
+  if(!ytReady || !currentVideoId) return;
+  const rect = document.getElementById('prog-track').getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  const dur = ytPlayer.getDuration();
+  if(dur) ytPlayer.seekTo(dur * pct, true);
+}
+
+function startProgTimer(){
+  if(progTimer) clearInterval(progTimer);
+  progTimer = setInterval(()=>{
+    if(!ytReady || !isPlaying) return;
+    try{
+      const cur = ytPlayer.getCurrentTime();
+      const dur = ytPlayer.getDuration();
+      if(dur){
+        const pct = (cur/dur)*100;
+        document.getElementById('prog-fill').style.width = pct + '%';
+        document.getElementById('prog-thumb').style.right = 'calc('+(100-pct)+'% - 5px)';
+        document.getElementById('pb-cur').textContent = fmtTime(cur);
+        document.getElementById('pb-dur').textContent = fmtTime(dur);
+      }
+    }catch(e){}
+  }, 500);
+}
+
+function fmtTime(s){
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return m + ':' + String(sec).padStart(2,'0');
+}
+
+function updatePlayerBar(s){
+  if(!s){
+    document.getElementById('pb-title').textContent = 'No song playing';
+    document.getElementById('pb-artist').textContent = '';
+    document.getElementById('pb-art').innerHTML = '🎵';
+    return;
+  }
+  document.getElementById('pb-title').textContent = s.title;
+  document.getElementById('pb-artist').textContent = s.artist;
+  document.getElementById('pb-art').innerHTML = s.art ? `<img src="${s.art}" style="width:100%;height:100%;object-fit:cover;border-radius:3px" onerror="this.parentElement.innerHTML='🎵'">` : '🎵';
+}
+
+function updatePlayingCard(){
+  document.querySelectorAll('.mcard').forEach(c => c.classList.remove('playing'));
+  document.querySelectorAll('.mbtn-play,.mbtn-playing').forEach(b => {
+    b.className = 'mbtn mbtn-play';
+    b.innerHTML = '▶ PLAY';
+  });
+  if(currentCardId){
+    const card = document.getElementById(currentCardId);
+    if(card){
+      card.classList.add('playing');
+      const pbtn = document.getElementById('pbtn-'+currentCardId);
+      if(pbtn){ pbtn.className='mbtn mbtn-playing'; pbtn.innerHTML='<span class="eq-anim"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span> PLAYING'; }
+    }
+  }
+}
+
+// ── QUEUE ─────────────────────────────────
+function addToQueue(title, artist, art, ytQuery){
+  queue.push({title, artist, art, ytQuery, vid: null});
+  // Pre-fetch video ID
+  searchYouTube(ytQuery).then(vid => {
+    const item = queue.find(q => q.title===title && q.artist===artist && !q.vid);
+    if(item) item.vid = vid;
+  });
+  updateQueuePanel();
+}
+
+function toggleQueue(){
+  const qp = document.getElementById('queue-panel');
+  qp.style.display = qp.style.display === 'none' ? 'block' : 'none';
+}
+
+function clearQueue(){
+  queue = []; queueIdx = -1;
+  updateQueuePanel();
+}
+
+function updateQueuePanel(){
+  document.getElementById('q-cnt').textContent = queue.length;
+  const el = document.getElementById('queue-list');
+  if(!queue.length){
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:11px;font-family:var(--fm)">Queue is empty</div>';
+    return;
+  }
+  el.innerHTML = queue.map((s,i)=>`
+    <div class="q-item ${i===queueIdx?'q-active':''}" onclick="playQueueItem(${i})">
+      <div style="font-size:9px;font-family:var(--fm);color:var(--text3);min-width:16px">${i+1}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;color:${i===queueIdx?'#cc88ff':'var(--text)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.title}</div>
+        <div style="font-size:10px;color:var(--text2)">${s.artist}</div>
+      </div>
+      ${i===queueIdx?'<span class="eq-anim"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></span>':''}
+    </div>`).join('');
+}
+
+function playQueueItem(idx){
+  queueIdx = idx;
+  const s = queue[idx];
+  updatePlayerBar(s);
+  if(s.vid) loadAndPlay(s.vid);
+  else searchYouTube(s.ytQuery).then(vid=>{ if(vid){s.vid=vid;loadAndPlay(vid);} });
+  updateQueuePanel();
+}
+
+// ── TRENDING ──────────────────────────────
+const TRENDING = [
+  {title:'Kesariya',artist:'Arijit Singh',art:null,ytQuery:'Kesariya Arijit Singh official audio',genre:'Bollywood'},
+  {title:'Blinding Lights',artist:'The Weeknd',art:null,ytQuery:'The Weeknd Blinding Lights official audio',genre:'Pop'},
+  {title:'Pasoori',artist:'Ali Sethi & Shae Gill',art:null,ytQuery:'Pasoori Ali Sethi Shae Gill official audio',genre:'Folk'},
+  {title:'Pachtaoge',artist:'Arijit Singh',art:null,ytQuery:'Pachtaoge Arijit Singh official audio',genre:'Bollywood'},
+  {title:'Flowers',artist:'Miley Cyrus',art:null,ytQuery:'Miley Cyrus Flowers official audio',genre:'Pop'},
+  {title:'Raataan Lambiyan',artist:'Jubin Nautiyal',art:null,ytQuery:'Raataan Lambiyan Jubin Nautiyal official audio',genre:'Bollywood'},
+  {title:'Nattu Nattu',artist:'M.M. Keeravani',art:null,ytQuery:'Nattu Nattu RRR official audio',genre:'Telugu'},
+  {title:'Levitating',artist:'Dua Lipa',art:null,ytQuery:'Dua Lipa Levitating official audio',genre:'Pop'},
+];
+
+function renderTrending(){
+  const el = document.getElementById('tgrid');
+  el.innerHTML = '';
+  TRENDING.forEach((s,i) => el.appendChild(buildMCard(s, 't'+i)));
+}
+
 </script>
 </body>
 </html>
