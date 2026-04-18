@@ -65,6 +65,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .ltx{font-family:var(--fh);font-size:20px;font-weight:900;letter-spacing:4px;background:linear-gradient(90deg,var(--glow),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .lsb{font-size:9px;color:var(--text3);letter-spacing:2px;font-family:var(--fm);margin-top:-3px}
 .pb{background:linear-gradient(135deg,rgba(255,214,0,.12),rgba(255,214,0,.04));border:1px solid rgba(255,214,0,.45);padding:4px 12px;border-radius:2px;font-family:var(--fh);font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px;text-shadow:0 0 10px rgba(255,214,0,.5)}
+.beta-badge{position:relative;display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:2px;font-family:var(--fh);font-size:9px;font-weight:700;letter-spacing:2px;color:#00ffcc;border:1px solid rgba(0,255,204,.4);background:linear-gradient(135deg,rgba(0,255,204,.08),rgba(0,255,204,.02));text-transform:uppercase;text-shadow:0 0 8px rgba(0,255,204,.8),0 0 20px rgba(0,255,204,.4);box-shadow:0 0 10px rgba(0,255,204,.1),inset 0 0 10px rgba(0,255,204,.03);animation:betaPulse 2s ease-in-out infinite;overflow:hidden}
+.beta-badge::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,255,204,.07),transparent);transform:translateX(-100%);animation:betaSweep 3s ease-in-out infinite}
+.beta-badge::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,204,.6),transparent);animation:betaLine 2s ease-in-out infinite}
+.beta-dot{width:5px;height:5px;border-radius:50%;background:#00ffcc;box-shadow:0 0 6px #00ffcc,0 0 12px rgba(0,255,204,.6);animation:betaDot 1.2s ease-in-out infinite alternate;flex-shrink:0}
+@keyframes betaPulse{0%,100%{box-shadow:0 0 10px rgba(0,255,204,.1),inset 0 0 10px rgba(0,255,204,.03);border-color:rgba(0,255,204,.4)}50%{box-shadow:0 0 18px rgba(0,255,204,.25),inset 0 0 14px rgba(0,255,204,.06);border-color:rgba(0,255,204,.7)}}
+@keyframes betaSweep{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
+@keyframes betaLine{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes betaDot{from{opacity:.4;transform:scale(.8)}to{opacity:1;transform:scale(1.2)}}
 .hnav{display:flex;gap:4px}
 .hn{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:6px 13px;border-radius:2px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:1px;transition:all .2s;text-transform:uppercase;position:relative;overflow:hidden}
 .hn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(0,240,255,.05),transparent);transform:translateX(-100%);transition:transform .3s}
@@ -247,6 +255,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
       <div class="li"></div>
       <div><div class="ltx">GSBW</div><div class="lsb">GLOBAL STEP BUG WRITER</div></div>
       <div class="pb">⚽ FIFA REFACTOR</div>
+      <div class="beta-badge"><span class="beta-dot"></span>ON BETA TEST</div>
     </div>
     <div class="hnav">
       <button class="hn on" id="hnw" onclick="showPage('write')">⚡ WRITE BUG</button>
