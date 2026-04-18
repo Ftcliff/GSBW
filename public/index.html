@@ -562,13 +562,20 @@ async function generateBug(){
   const prompt=`You are a senior Game QA engineer writing bug reports for "FIFA Refactor" (a football/soccer video game).
 
 STRICT RULES:
-1. TITLE: [PARENT] Component - Short summary (only first word capitalised, rest lowercase unless proper noun)
+1. TITLE FORMAT — follow this EXACTLY, no exceptions:
+   - Must start with [PARENT] where PARENT is the parent feature name IN UPPERCASE inside square brackets
+   - Then a space, then the component name (as-is from the list), then space-hyphen-space
+   - Then the short summary: sentence case — ONLY first word capitalised, all other words lowercase unless a proper noun
+   - CORRECT example:   [GOALKEEPER] Corner Kicks - Goalkeeper exits goal area and does not return after corner kick
+   - WRONG examples:    controls component - button press issue   (missing brackets, all lowercase)
+   -                    [Controls] Component - Button Press Issue  (wrong case)
+   -                    [CONTROLS] Component - button press issue  (parent must match list exactly but uppercase in brackets)
 2. SHORT SUMMARIES: ONE single paragraph, minimum 15 words, simple plain English, all 3 variations clearly different from each other
 3. LONG SUMMARIES: ONE single paragraph minimum 40 words, no bullet points, simple plain English, all 3 variations clearly different from each other
 4. REPRO STEPS: Clear numbered steps in simple English
 5. OBSERVED: Start with "Observe that"
 6. EXPECTED: Start with "Expected that"
-7. AUTO-DETECT parent and component from the lists if not provided
+7. AUTO-DETECT parent and component from the available lists if not provided
 
 Parent: ${parent||'NOT SELECTED - auto-detect'}
 Component: ${comp||'NOT SELECTED - auto-detect'}
@@ -591,6 +598,42 @@ Respond ONLY with valid JSON, no markdown, no extra text:
     const txt=data.content.filter(x=>x.type==='text').map(x=>x.text).join('');
     const clean=txt.replace(/```json|```/g,'').trim();
     const bug=JSON.parse(clean);
+
+    // ── Enforce correct title format: [PARENT] Component - Summary ──
+    // Even if AI returns wrong format, fix it here before display
+    (function enforceTitleFormat(){
+      if(!bug.title || !bug.parent || !bug.component) return;
+      const title = bug.title;
+      // Check if title already starts with [PARENT] in correct format
+      const correctPrefix = '['+bug.parent.toUpperCase()+'] '+bug.component+' - ';
+      if(!title.startsWith('['+bug.parent.toUpperCase()+']')){
+        // Extract whatever summary part exists after any separator
+        let summary = '';
+        const dashIdx = title.indexOf(' - ');
+        if(dashIdx !== -1){
+          summary = title.slice(dashIdx + 3);
+        } else {
+          summary = title;
+        }
+        // Apply sentence case to summary (only first word capitalised)
+        if(summary.length > 0){
+          summary = summary.charAt(0).toUpperCase() + summary.slice(1).toLowerCase();
+        }
+        bug.title = correctPrefix + summary;
+      } else {
+        // Prefix is correct — just fix sentence case of the summary part
+        const prefixLen = ('['+bug.parent.toUpperCase()+'] '+bug.component+' - ').length;
+        let summary = title.slice(prefixLen);
+        if(summary.length > 0){
+          summary = summary.charAt(0).toUpperCase() + summary.slice(1).toLowerCase()
+            // Preserve proper nouns from parent/component names
+            .replace(new RegExp('\\b('+bug.parent+')\\b','gi'), bug.parent)
+            .replace(new RegExp('\\b('+bug.component+')\\b','gi'), bug.component);
+        }
+        bug.title = title.slice(0, prefixLen) + summary;
+      }
+    })();
+
     currentBug=bug;
 
     // ── Handle Parent: select in dropdown, ask user if not in list ──
