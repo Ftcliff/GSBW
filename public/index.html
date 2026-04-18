@@ -483,18 +483,40 @@ let bugLog=[],currentBug=null,sessionStart=Date.now();
 
 // ── PERSISTENT STORAGE ───────────────────
 async function loadPersisted(){
+  // Try server first
   try{
-    const r=await fetch('/api/data'); const d=await r.json();
-    customParents=d.customParents||[]; customComps=d.customComps||[];
+    const r=await fetch('/api/data');
+    if(r.ok){
+      const d=await r.json();
+      customParents=Array.isArray(d.customParents)?d.customParents:[];
+      customComps=Array.isArray(d.customComps)?d.customComps:[];
+      // Also sync to localStorage as backup
+      try{localStorage.setItem('gsbw_parents',JSON.stringify(customParents));localStorage.setItem('gsbw_comps',JSON.stringify(customComps));}catch(e){}
+    } else { throw new Error('server not ok'); }
   }catch(e){
-    try{ customParents=JSON.parse(localStorage.getItem('gsbw_parents')||'[]'); customComps=JSON.parse(localStorage.getItem('gsbw_comps')||'[]'); }catch(e2){}
+    // Fallback to localStorage
+    try{
+      customParents=JSON.parse(localStorage.getItem('gsbw_parents')||'[]');
+      customComps=JSON.parse(localStorage.getItem('gsbw_comps')||'[]');
+    }catch(e2){ customParents=[]; customComps=[]; }
   }
+  // Deduplicate against base lists
+  customParents=customParents.filter(p=>!BASE_PARENTS.includes(p));
+  customComps=customComps.filter(c=>!BASE_COMPS.includes(c));
   parents=[...BASE_PARENTS,...customParents];
   comps=[...BASE_COMPS,...customComps];
 }
 async function persistData(){
-  try{ await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customParents,customComps})}); }catch(e){}
-  try{ localStorage.setItem('gsbw_parents',JSON.stringify(customParents)); localStorage.setItem('gsbw_comps',JSON.stringify(customComps)); }catch(e){}
+  const payload={customParents,customComps};
+  // Save to localStorage immediately (instant, never fails)
+  try{
+    localStorage.setItem('gsbw_parents',JSON.stringify(customParents));
+    localStorage.setItem('gsbw_comps',JSON.stringify(customComps));
+  }catch(e){}
+  // Also save to server (persists across browser clears and team deployments)
+  try{
+    await fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  }catch(e){}
 }
 
 // ── INIT ─────────────────────────────────
@@ -552,8 +574,11 @@ Parent: ${parent||'NOT SELECTED - auto-detect'}
 Component: ${comp||'NOT SELECTED - auto-detect'}
 Bug Description: ${desc}
 Steps Provided: ${steps||'None - generate logical steps'}
-Available Parents: ${parents.join(', ')}
-Available Components: ${comps.join(', ')}
+Available Parents (use ONLY from this list, includes custom entries): ${parents.join(', ')}
+Available Components (use ONLY from this list, includes custom entries): ${comps.join(', ')}
+Custom Parents added by team: ${customParents.length>0?customParents.join(', '):'none'}
+Custom Components added by team: ${customComps.length>0?customComps.join(', '):'none'}
+IMPORTANT: Custom entries added by team are valid and should be matched first if relevant to the bug description.
 
 Respond ONLY with valid JSON, no markdown, no extra text:
 {"title":"[PARENT] Component - Short summary sentence","parent":"exact parent","component":"exact component","priority":"P0 or P1 or P2 or P3 or P4 or P5","severity":"S1 or S2 or S3 or S4","priority_reason":"one short plain sentence","short_summaries":["variation 1 min 15 words single paragraph","variation 2 completely different min 15 words","variation 3 different angle min 15 words"],"long_summaries":["variation 1 single paragraph min 40 words","variation 2 different angle min 40 words","variation 3 technical focus min 40 words"],"repro_steps":["Step 1","Step 2","Step 3","Step 4","Step 5"],"observed":"Observe that [exact broken behaviour]","expected":"Expected that [correct behaviour]","auto_parent":${!parent},"auto_comp":${!comp}}`;
@@ -567,16 +592,83 @@ Respond ONLY with valid JSON, no markdown, no extra text:
     const clean=txt.replace(/```json|```/g,'').trim();
     const bug=JSON.parse(clean);
     currentBug=bug;
-    if(bug.auto_parent&&bug.parent){
-      const sp=document.getElementById('sel-parent');
-      for(let i=0;i<sp.options.length;i++){if(sp.options[i].text===bug.parent){sp.selectedIndex=i;break}}
-      document.getElementById('pb2').style.display='inline-flex';
+
+    // ── Handle Parent: select in dropdown, ask user if not in list ──
+    if(bug.parent){
+      if(!parents.includes(bug.parent)){
+        // Not in list — ask user first before saving
+        pendingNewParent=bug.parent;
+        showConfirmModal(
+          'NEW PARENT DETECTED',
+          'AI suggested "<strong style="color:var(--glow)">'+bug.parent+'</strong>" as the parent but it is not in your list.',
+          'SAVE TO LIST',
+          'SKIP',
+          async()=>{
+            if(pendingNewParent){
+              customParents.push(pendingNewParent);
+              parents=[...BASE_PARENTS,...customParents];
+              await persistData(); fillSelects(); renderAddon();
+              // Now select it
+              const sp=document.getElementById('sel-parent');
+              for(let i=0;i<sp.options.length;i++){if(sp.options[i].text===pendingNewParent){sp.selectedIndex=i;break}}
+              const pb2=document.getElementById('pb2');
+              pb2.style.display='inline-flex';
+              pb2.innerHTML='<span class="adc" style="background:var(--accent2)"></span>SAVED';
+              pb2.style.background='rgba(255,107,0,.12)';pb2.style.borderColor='rgba(255,107,0,.4)';pb2.style.color='var(--accent2)';
+              notify('✓ PARENT SAVED: '+pendingNewParent.toUpperCase());
+              pendingNewParent=null;
+            }
+          },
+          ()=>{ pendingNewParent=null; notify('PARENT NOT SAVED — USED FOR THIS REPORT ONLY'); }
+        );
+      } else {
+        // In list — just select it
+        const sp=document.getElementById('sel-parent');
+        for(let i=0;i<sp.options.length;i++){if(sp.options[i].text===bug.parent){sp.selectedIndex=i;break}}
+        const pb2=document.getElementById('pb2');
+        pb2.style.display='inline-flex';
+        pb2.style.background=''; pb2.style.borderColor=''; pb2.style.color='';
+        pb2.innerHTML='<span class="adc"></span>'+(customParents.includes(bug.parent)?'CUSTOM':'AUTO');
+      }
     }
-    if(bug.auto_comp&&bug.component){
-      const sc=document.getElementById('sel-comp');
-      for(let i=0;i<sc.options.length;i++){if(sc.options[i].text===bug.component){sc.selectedIndex=i;break}}
-      document.getElementById('cb2').style.display='inline-flex';
+
+    // ── Handle Component: select in dropdown, ask user if not in list ──
+    if(bug.component){
+      if(!comps.includes(bug.component)){
+        // Not in list — ask user first before saving
+        pendingNewComp=bug.component;
+        showConfirmModal(
+          'NEW COMPONENT DETECTED',
+          'AI suggested "<strong style="color:var(--glow)">'+bug.component+'</strong>" as the component but it is not in your list.',
+          'SAVE TO LIST',
+          'SKIP',
+          async()=>{
+            if(pendingNewComp){
+              customComps.push(pendingNewComp);
+              comps=[...BASE_COMPS,...customComps];
+              await persistData(); fillSelects(); renderAddon();
+              const sc=document.getElementById('sel-comp');
+              for(let i=0;i<sc.options.length;i++){if(sc.options[i].text===pendingNewComp){sc.selectedIndex=i;break}}
+              const cb2=document.getElementById('cb2');
+              cb2.style.display='inline-flex';
+              cb2.innerHTML='<span class="adc" style="background:var(--accent2)"></span>SAVED';
+              cb2.style.background='rgba(255,107,0,.12)';cb2.style.borderColor='rgba(255,107,0,.4)';cb2.style.color='var(--accent2)';
+              notify('✓ COMPONENT SAVED: '+pendingNewComp.toUpperCase());
+              pendingNewComp=null;
+            }
+          },
+          ()=>{ pendingNewComp=null; notify('COMPONENT NOT SAVED — USED FOR THIS REPORT ONLY'); }
+        );
+      } else {
+        const sc=document.getElementById('sel-comp');
+        for(let i=0;i<sc.options.length;i++){if(sc.options[i].text===bug.component){sc.selectedIndex=i;break}}
+        const cb2=document.getElementById('cb2');
+        cb2.style.display='inline-flex';
+        cb2.style.background=''; cb2.style.borderColor=''; cb2.style.color='';
+        cb2.innerHTML='<span class="adc"></span>'+(customComps.includes(bug.component)?'CUSTOM':'AUTO');
+      }
     }
+
     stopLoad(); renderBug(bug);
   }catch(e){
     stopLoad();
@@ -643,15 +735,63 @@ function clearLog(){bugLog=[];renderLog();notify('LOG CLEARED')}
 
 // ── ADDON ────────────────────────────────
 function renderAddon(){
-  document.getElementById('pc2').textContent='('+parents.length+')';
-  document.getElementById('cc2').textContent='('+comps.length+')';
-  document.getElementById('plist').innerHTML=[...parents].sort().map(p=>{const isC=customParents.includes(p);return `<div class="li2"><span>${p}${isC?' <span style="color:var(--accent3);font-size:9px;font-family:var(--fm)">[custom]</span>':''}</span>${isC?`<button class="rmb" onclick="rmP('${esc(p)}')">✕</button>`:'<span style="font-size:9px;color:var(--text3)">base</span>'}</div>`;}).join('');
-  document.getElementById('clist').innerHTML=[...comps].sort().map(c=>{const isC=customComps.includes(c);return `<div class="li2"><span>${c}${isC?' <span style="color:var(--accent3);font-size:9px;font-family:var(--fm)">[custom]</span>':''}</span>${isC?`<button class="rmb" onclick="rmC('${esc(c)}')">✕</button>`:'<span style="font-size:9px;color:var(--text3)">base</span>'}</div>`;}).join('');
+  document.getElementById('pc2').textContent='('+parents.length+' total, '+customParents.length+' custom)';
+  document.getElementById('cc2').textContent='('+comps.length+' total, '+customComps.length+' custom)';
+
+  document.getElementById('plist').innerHTML=[...parents].sort().map(p=>{
+    const isC=customParents.includes(p);
+    return `<div class="li2">
+      <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}</span>
+        ${isC?`<span style="color:var(--accent3);font-size:9px;font-family:var(--fm);flex-shrink:0;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);padding:1px 5px;border-radius:2px">CUSTOM</span>`:''}
+      </span>
+      ${isC
+        ?`<button class="rmb" onclick="rmP('${esc(p)}')" title="Remove custom parent">✕</button>`
+        :`<span style="font-size:9px;color:var(--text3);font-family:var(--fm);flex-shrink:0">BASE</span>`
+      }
+    </div>`;
+  }).join('');
+
+  document.getElementById('clist').innerHTML=[...comps].sort().map(c=>{
+    const isC=customComps.includes(c);
+    return `<div class="li2">
+      <span style="display:flex;align-items:center;gap:6px;min-width:0;flex:1">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c}</span>
+        ${isC?`<span style="color:var(--accent3);font-size:9px;font-family:var(--fm);flex-shrink:0;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.2);padding:1px 5px;border-radius:2px">CUSTOM</span>`:''}
+      </span>
+      ${isC
+        ?`<button class="rmb" onclick="rmC('${esc(c)}')" title="Remove custom component">✕</button>`
+        :`<span style="font-size:9px;color:var(--text3);font-family:var(--fm);flex-shrink:0">BASE</span>`
+      }
+    </div>`;
+  }).join('');
 }
 function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
-async function addParent(){const v=document.getElementById('inp-np').value.trim();if(!v||parents.includes(v)){notify('ALREADY EXISTS OR EMPTY',true);return}customParents.push(v);parents=[...BASE_PARENTS,...customParents];document.getElementById('inp-np').value='';await persistData();renderAddon();fillSelects();notify('PARENT SAVED')}
+async function addParent(){
+  const v=document.getElementById('inp-np').value.trim();
+  if(!v){notify('ENTER A PARENT NAME FIRST',true);return}
+  if(parents.includes(v)){notify('"'+v+'" ALREADY EXISTS IN THE LIST',true);return}
+  customParents.push(v);
+  parents=[...BASE_PARENTS,...customParents];
+  document.getElementById('inp-np').value='';
+  await persistData();
+  renderAddon();
+  fillSelects();
+  notify('✓ PARENT SAVED: '+v.toUpperCase()+' — AI WILL NOW USE IT');
+}
 async function rmP(p){customParents=customParents.filter(x=>x!==p);parents=[...BASE_PARENTS,...customParents];await persistData();renderAddon();fillSelects();notify('REMOVED')}
-async function addComp(){const v=document.getElementById('inp-nc').value.trim();if(!v||comps.includes(v)){notify('ALREADY EXISTS OR EMPTY',true);return}customComps.push(v);comps=[...BASE_COMPS,...customComps];document.getElementById('inp-nc').value='';await persistData();renderAddon();fillSelects();notify('COMPONENT SAVED')}
+async function addComp(){
+  const v=document.getElementById('inp-nc').value.trim();
+  if(!v){notify('ENTER A COMPONENT NAME FIRST',true);return}
+  if(comps.includes(v)){notify('"'+v+'" ALREADY EXISTS IN THE LIST',true);return}
+  customComps.push(v);
+  comps=[...BASE_COMPS,...customComps];
+  document.getElementById('inp-nc').value='';
+  await persistData();
+  renderAddon();
+  fillSelects();
+  notify('✓ COMPONENT SAVED: '+v.toUpperCase()+' — AI WILL NOW USE IT');
+}
 async function rmC(c){customComps=customComps.filter(x=>x!==c);comps=[...BASE_COMPS,...customComps];await persistData();renderAddon();fillSelects();notify('REMOVED')}
 
 // ── TIMER ────────────────────────────────
@@ -677,6 +817,55 @@ function notify(msg,isErr=false){
 
 document.getElementById('sel-parent').addEventListener('change',()=>document.getElementById('pb2').style.display='none');
 document.getElementById('sel-comp').addEventListener('change',()=>document.getElementById('cb2').style.display='none');
+
+// ── Pending confirmation state ────────────────────────
+let pendingNewParent=null, pendingNewComp=null;
+
+// ── Confirm Modal (ask user before saving unknown parent/component) ──
+function showConfirmModal(title, msg, okLabel, cancelLabel, onOk, onCancel){
+  // Build modal HTML
+  const existing=document.getElementById('confirm-modal');
+  if(existing) existing.remove();
+
+  const overlay=document.createElement('div');
+  overlay.id='confirm-modal';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);animation:fadeU .2s ease';
+
+  overlay.innerHTML=`
+    <div style="background:rgba(6,15,28,.99);border:1px solid var(--border2);border-radius:6px;width:420px;max-width:94vw;padding:0;position:relative;box-shadow:0 0 50px rgba(0,240,255,.1)">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glow),var(--accent2),transparent)"></div>
+      <div style="padding:20px 22px 16px">
+        <div style="font-family:var(--fh);font-size:11px;font-weight:700;color:var(--glow);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--accent2);display:inline-block;box-shadow:0 0 6px var(--accent2)"></span>
+          ${title}
+        </div>
+        <div style="font-size:12px;color:var(--text2);font-family:var(--fb);line-height:1.7;margin-bottom:6px">${msg}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--fm);margin-bottom:18px">Save it to your list so AI can use it in future reports?</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button id="cm-cancel" style="background:transparent;border:1px solid var(--border2);color:var(--text2);padding:7px 16px;border-radius:2px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:1px;text-transform:uppercase;transition:all .2s">${cancelLabel}</button>
+          <button id="cm-ok" style="background:linear-gradient(135deg,rgba(0,240,255,.15),rgba(0,240,255,.06));border:1px solid rgba(0,240,255,.4);color:var(--glow);padding:7px 18px;border-radius:2px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fh);letter-spacing:1px;text-transform:uppercase;transition:all .2s;box-shadow:0 0 12px rgba(0,240,255,.1)">${okLabel}</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('#cm-ok').addEventListener('click',()=>{
+    overlay.remove();
+    if(onOk) onOk();
+  });
+  overlay.querySelector('#cm-cancel').addEventListener('click',()=>{
+    overlay.remove();
+    if(onCancel) onCancel();
+  });
+  // Hover effects
+  const okBtn=overlay.querySelector('#cm-ok');
+  const cancelBtn=overlay.querySelector('#cm-cancel');
+  okBtn.addEventListener('mouseover',()=>{okBtn.style.boxShadow='0 0 20px rgba(0,240,255,.25)';okBtn.style.borderColor='var(--glow)'});
+  okBtn.addEventListener('mouseout',()=>{okBtn.style.boxShadow='0 0 12px rgba(0,240,255,.1)';okBtn.style.borderColor='rgba(0,240,255,.4)'});
+  cancelBtn.addEventListener('mouseover',()=>{cancelBtn.style.borderColor='var(--p0)';cancelBtn.style.color='var(--p0)'});
+  cancelBtn.addEventListener('mouseout',()=>{cancelBtn.style.borderColor='var(--border2)';cancelBtn.style.color='var(--text2)'});
+}
 
 init();
 </script>
