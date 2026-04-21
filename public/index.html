@@ -568,36 +568,53 @@ async function generateBug(){
   const btn=document.getElementById('btn-gen');
   btn.disabled=true; startLoad();
 
-  const prompt=`You are a senior Game QA engineer writing bug reports for "FIFA Refactor" (a football/soccer video game).
+  const prompt=`You are writing a bug report for the FIFA Refactor project. Below is what the tester has described. Even if the description is informal, incomplete, has typos, or is written in broken English — understand what they mean and write a perfect professional bug report from it.
 
-STRICT RULES:
-1. TITLE FORMAT — follow this EXACTLY, no exceptions:
-   - Must start with [PARENT] where PARENT is the parent feature name IN UPPERCASE inside square brackets
-   - Then a space, then the component name (as-is from the list), then space-hyphen-space
-   - Then the short summary: sentence case — ONLY first word capitalised, all other words lowercase unless a proper noun
-   - CORRECT example:   [GOALKEEPER] Corner Kicks - Goalkeeper exits goal area and does not return after corner kick
-   - WRONG examples:    controls component - button press issue   (missing brackets, all lowercase)
-   -                    [Controls] Component - Button Press Issue  (wrong case)
-   -                    [CONTROLS] Component - button press issue  (parent must match list exactly but uppercase in brackets)
-2. SHORT SUMMARIES: ONE single paragraph, minimum 15 words, simple plain English, all 3 variations clearly different from each other
-3. LONG SUMMARIES: ONE single paragraph minimum 40 words, no bullet points, simple plain English, all 3 variations clearly different from each other
-4. REPRO STEPS: Clear numbered steps in simple English
-5. OBSERVED: Start with "Observe that"
-6. EXPECTED: Start with "Expected that"
-7. AUTO-DETECT parent and component from the available lists if not provided
+UNDERSTAND THE TESTER:
+- Figure out exactly what game feature is broken based on context clues
+- If they say "keeper runs off" — that is a Goalkeeper positioning bug
+- If they say "button not working" — that is a Controls/Input bug
+- If they say "game crashes when doing X" — that is a Crash bug
+- Use football/soccer game knowledge to fill in missing context intelligently
 
-Parent: ${parent||'NOT SELECTED - auto-detect'}
-Component: ${comp||'NOT SELECTED - auto-detect'}
-Bug Description: ${desc}
-Steps Provided: ${steps||'None - generate logical steps'}
-Available Parents (use ONLY from this list, includes custom entries): ${parents.join(', ')}
-Available Components (use ONLY from this list, includes custom entries): ${comps.join(', ')}
+TITLE FORMAT — MUST follow exactly:
+- Format: [PARENT] Component - Short summary sentence
+- [PARENT] = parent name in UPPERCASE inside square brackets
+- Component = component name exactly as it appears in the list
+- Summary = sentence case (only first word capitalised, rest lowercase unless proper noun)
+- CORRECT: [GOALKEEPER] Corner Kicks - Goalkeeper exits goal area and does not return during corner kick
+- WRONG: controls component - button press issue
+
+WRITING STYLE — write like a smart, experienced QA engineer:
+- Use simple, clear, natural English — easy to read and understand
+- Short summaries: minimum 15 words, one flowing sentence, straight to the point
+- Long summaries: minimum 40 words, one flowing paragraph, explain what happens, when it happens, and the impact on gameplay
+- All 3 variations of short summary must be clearly different from each other (different wording, different angle)
+- All 3 variations of long summary must be clearly different from each other (different structure, different focus)
+- Repro steps: clear numbered steps that any junior tester can follow
+- Observed: start with "Observe that" — describe exactly what goes wrong in plain words
+- Expected: start with "Expected that" — describe what should happen instead
+
+PRIORITY GUIDE:
+- P0/S1: Game crash, complete feature broken, unplayable
+- P1/S2: Major feature broken, significantly impacts gameplay
+- P2/S3: Feature partially broken, workaround exists
+- P3/S4: Minor issue, small visual or audio glitch
+- P4/S4: Cosmetic only, no gameplay impact
+- P5/S4: Trivial, barely noticeable
+
+Parent selected: ${parent||'Auto-detect from description'}
+Component selected: ${comp||'Auto-detect from description'}
+Tester description: ${desc}
+Steps provided: ${steps||'Not provided — generate logical steps from description'}
+Available Parents: ${parents.join(', ')}
+Available Components: ${comps.join(', ')}
 Custom Parents added by team: ${customParents.length>0?customParents.join(', '):'none'}
 Custom Components added by team: ${customComps.length>0?customComps.join(', '):'none'}
-IMPORTANT: Custom entries added by team are valid and should be matched first if relevant to the bug description.
+NOTE: Custom entries take priority — match them first if relevant.
 
-Respond ONLY with valid JSON, no markdown, no extra text:
-{"title":"[PARENT] Component - Short summary sentence","parent":"exact parent","component":"exact component","priority":"P0 or P1 or P2 or P3 or P4 or P5","severity":"S1 or S2 or S3 or S4","priority_reason":"one short plain sentence","short_summaries":["variation 1 min 15 words single paragraph","variation 2 completely different min 15 words","variation 3 different angle min 15 words"],"long_summaries":["variation 1 single paragraph min 40 words","variation 2 different angle min 40 words","variation 3 technical focus min 40 words"],"repro_steps":["Step 1","Step 2","Step 3","Step 4","Step 5"],"observed":"Observe that [exact broken behaviour]","expected":"Expected that [correct behaviour]","auto_parent":${!parent},"auto_comp":${!comp}}`;
+Respond ONLY with this JSON, no markdown, no code fences, nothing else:
+{"title":"[PARENT] Component - Short summary sentence","parent":"exact parent name from list","component":"exact component name from list","priority":"P0 or P1 or P2 or P3 or P4 or P5","severity":"S1 or S2 or S3 or S4","priority_reason":"one clear simple sentence explaining why this priority","short_summaries":["variation 1 — min 15 words, plain English, different wording","variation 2 — min 15 words, completely different angle","variation 3 — min 15 words, different focus"],"long_summaries":["variation 1 — single paragraph min 40 words, what happens and impact","variation 2 — single paragraph min 40 words, different angle and focus","variation 3 — single paragraph min 40 words, more technical detail"],"repro_steps":["Step 1: action","Step 2: action","Step 3: action","Step 4: action","Step 5: observe the issue"],"observed":"Observe that [exact broken behaviour described simply]","expected":"Expected that [correct behaviour described simply]","auto_parent":${!parent},"auto_comp":${!comp}}`;
 
   try{
     const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:1800,messages:[{role:'user',content:prompt}]})});
