@@ -24,37 +24,46 @@ function saveData(d) {
 }
 
 app.get('/api/data', (req, res) => res.json(loadData()));
+app.post('/api/data', (req, res) => { saveData(req.body); res.json({ ok: true }); });
 
-app.post('/api/data', (req, res) => {
-  saveData(req.body);
-  res.json({ ok: true });
-});
-
-// Groq proxy
+// OpenAI ChatGPT proxy
 app.post('/api/generate', async (req, res) => {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY not set in .env file' });
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY not set in .env file' });
+
   try {
     const fetch = (...args) => import('node-fetch').then(({ default: f }) => f(...args));
     const userMessage = req.body.messages?.[0]?.content || '';
-    const groqBody = {
-      model: 'llama-3.3-70b-versatile',
+
+    const openaiBody = {
+      model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are a professional Game QA bug writer. Always respond with valid JSON only — no markdown, no code fences, no extra text.' },
+        {
+          role: 'system',
+          content: 'You are a professional Game QA bug writer. Always respond with valid JSON only — no markdown, no code fences, no extra text before or after the JSON object. Follow all formatting rules exactly as instructed.'
+        },
         { role: 'user', content: userMessage }
       ],
       max_tokens: 1800,
       temperature: 0.3
     };
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify(groqBody)
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(openaiBody)
     });
+
     const data = await response.json();
+
     if (data.error) return res.status(500).json({ error: data.error.message || JSON.stringify(data.error) });
+
     const text = data.choices?.[0]?.message?.content || '';
     res.json({ content: [{ type: 'text', text }] });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -63,5 +72,6 @@ app.post('/api/generate', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n🎮 GSBW running at http://localhost:${PORT}`);
-  console.log(`   GROQ_API_KEY: ${process.env.GROQ_API_KEY ? '✅ Loaded' : '❌ NOT FOUND'}\n`);
+  console.log(`   Powered by ChatGPT (GPT-4o mini)`);
+  console.log(`   OPENAI_API_KEY: ${process.env.OPENAI_API_KEY ? '✅ Loaded' : '❌ NOT FOUND — check your .env file'}\n`);
 });
